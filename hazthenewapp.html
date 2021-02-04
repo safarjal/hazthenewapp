@@ -146,6 +146,10 @@
 			inputs.forEach(function (inp) { gid(inp).addEventListener('input', inputHandler) });
 			inputHandler(0);
 		}
+
+		function getInputValues(){
+
+		}
 	</script>
 	<!-- This is where we keep the css currently. When done we will
          move it out to the css file	-->
@@ -177,6 +181,16 @@
 		<li>Haiz <span id="samehz"></span> <span id="valhz"></span> days</li>
 		<li>Tuhr <span id="samegp"></span> <span id="valgp"></span> days</li>
 	</ul>
+	<p>&nbsp;</p>
+	<p>-------------------------------------</p>
+	<p>&nbsp;</p>
+	<p>Duration Calculator</p>
+	<table>
+		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16"></td></tr>
+		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16"></td></tr>
+	</table>
+	<p>The duration is <span id="daysduration"></span>, <span id="hoursduration></span>, <span id="minutesduration"></span></p>
+
 	<script>start()</script>
   </body>
 </html>
