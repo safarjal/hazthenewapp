@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<!-- This is a comment in html -->
+	<!-- This loads a file containing a program written in javascript
+		 Ideally we should separate text, programs, and formatting.
+		 To start with it is easiest to keep it all together
+		 Currently the program file is empty -->
+    <script src="scripts/hazapp.js"></script>
+	<!-- This loads a css file to show exactly how to format objects
+		 Currently the file is empty -->
+    <link rel="stylesheet" type="text/css" href="css/hazapp.css">
+	<!-- This is where we keep the program currently. When done we will
+         move it out to the js file	-->
+	<script>
+		"use strict"		// this should usually be the first line, catches many errors
+		// Also useful in browser to right click and "Inspect Element"
+		//    this opens an inspector window in the lower half
+		//    open the console tab, and you can see error messages
+		//    you can also print the values of variables to debug here
+		
+		// This start is called just once, and the call is at the end of the file.
+		// It needs to be at the end, so that when it is called, all of the file
+		// has been read in, so that all the ids and stuff exist for the program to run.
+		// Once it has run, hooks are set up, so that whenever any input changes,
+		// the inputHandler function is called.
+		
+		// TESTING
+		//  MP<GP     GP==MP        |   MP>GP
+		//  X = dm-(gp-mp)          |   X = hz-(MP-GP)
+		//  X1 < 3 <= X2 < hz <= X3  |   X1 < 0 < X2 < 3 <= X3
+		//   what if HZ<3?
+		//
+		//	MP,GP = (26,19)
+		//  X = DM-7
+		//  X7=7 DM,HZ = (14,6) 
+		//  X6=6 DM,HZ = (13,6)
+		//  X5=5 DM,HZ = (12,6)
+		//  X4=3 DM,HZ = (10,6)
+		//  X3=1 DM,HZ = (8,6)
+		//  X2=0 DM,HZ = (7,6)
+		//  X1<0 DM,HZ = (6,6)
+		
+		//	MP,GP = (23,23) |    (19,26)    
+		//  X = DM
+		//  X7=7 DM,HZ = (7,6) 
+		//  X6=6 DM,HZ = (6,6)
+		//  X5=5 DM,HZ = (5,6)
+		//  X4=3 DM,HZ = (3,6)
+		//  X3=1 DM,HZ = (1,6)
+		//  X2=0 DM,HZ = (0,6)  ?
+		//  X1<0 DM,HZ = (-1,6) ?
+
+		//	MP,GP = (19,26)    
+		//  X = HZ-7
+		//  X7=7 DM,HZ = (6,6) 
+		//  X6=6 DM,HZ = (6,6)
+		//  X5=5 DM,HZ = (5,6)
+		//  X4=3 DM,HZ = (3,6)
+		//  X3=1 DM,HZ = (1,6)
+		//  X2=0 DM,HZ = (0,6)  ?
+		//  X1<0 DM,HZ = (-1,6) ?
+		
+		function gid(id) { return document.getElementById(id) }
+		function start () {
+			// this defines a function called gid, which is equivalent to
+			// the builtin function document.getElementById. It is very
+			// often used, so a short name is nice
+			function print_soorat(cond, soorat) {
+				gid('cond').innerHTML = cond;
+				gid('soorat').innerHTML = soorat;
+			}
+			function print_days(hukm, val, type) {
+				gid('val' + hukm).innerHTML = val
+				gid('type' + hukm).innerHTML = type
+				if (hukm == 1)      { gid('hukm2').classList.add('hide'); }
+				else if (hukm == 2) { gid('hukm2').classList.remove('hide'); }
+			}
+			function print_aadat(namehz, valhz, namegp, valgp) {
+				gid('samehz').innerHTML = namehz == 'hz' ? 'remains the same' : 'changes to';
+				gid('valhz').innerHTML = valhz
+				gid('samegp').innerHTML = namegp == 'gp' ? 'remains the same' : 'changes to';
+				gid('valgp').innerHTML = valgp
+			}
+			const inputs = ['mp', 'gp', 'dm', 'hz'];
+			// this function is called any time any of the four inputs are changed
+			// it updates the values of all the text in the html
+			const inputHandler = function(e) {
+				var [mp, gp, dm, hz] = inputs.map(function (inp) { return Number(gid(inp).value); })
+				gid('dam').innerHTML = dm;
+				if (mp <= gp) {    //Qism A
+					gid('comp').innerHTML = '&leq;';
+					gid('AorB').innerHTML = 'A';
+					gid('dif').innerHTML = gp - mp;
+					if (hz <= dm - (gp - mp)) {	                  // soorat A-1
+						print_soorat(`${dm} (dam) - ${gp-mp} (difference of pakis) = ${dm-(gp-mp)} &geq; ${hz} (haiz)`, 'A-1');
+						// if GP==MP, we would output 0 istihaza, not good!
+						// 0 istihaza is ok, for now. just no negative numbers, please
+						print_days(1, `${gp-mp}`,      'istihaza');
+						print_days(2, `${hz}`,            'haiz');
+						// what if DM = HZ + (GP-MP), then we would have 0 istihza, not good!
+						//0 istihaza is ok
+						print_days(3, `${dm-(gp-mp)-hz}`, 'istihaza');
+						print_aadat('hz', hz, 'gp', gp);
+					}
+					else if (3 <= dm-(gp-mp) && dm-(gp-mp) < hz) {  // soorat A-2
+						print_soorat(`${dm} (dam) - ${gp-mp} (difference of pakis) = ${dm-(gp-mp)} and 3 &leq; ${dm-(gp-mp)} &lt; ${hz} (haiz)`, 'A-2');
+						print_days(1, `${gp-mp}`, 'istihaza');
+						print_days(3, `${dm-(gp-mp)}`, 'haiz');
+						print_aadat('DM–(GP–MP)', dm-(gp-mp), 'gp', gp);
+					}
+					else if (dm - (gp - mp) < 3) {                  // soorat A-3
+						if (gp - mp > dm) //this if is added because there is a horror of seeing negative numbers
+							print_soorat(`${gp-mp} (difference of pakis) &gt; ${dm} (dam)`, 'A-3');
+						else 
+							print_soorat(`${dm} (dam) - ${gp-mp} (difference of pakis) = ${dm-(gp-mp)} &lt; 3`, 'A-3');
+						print_days(1, `${hz}`, 'haiz');
+						print_days(3, `${dm-hz}`, 'istihaza');
+						print_aadat('hz', hz, 'MP', mp);
+					}
+				}				
+				else {	// mp>gp qism B
+					gid('comp').innerHTML = '&gt;';
+					gid('AorB').innerHTML = 'B';
+					gid('dif').innerHTML = mp - gp;
+					if (hz - (mp - gp) >= 3) {							// soorat B-2
+						print_soorat(`${hz} (haiz) - ${mp-gp} (difference of pakis) = ${hz-(mp-gp)} &geq; 3`,'B-2')
+						print_days(1, `${hz-(mp-gp)}`, 'haiz')
+						print_days(3, `${dm-(hz-(mp-gp))}`, 'istihaza')
+						print_aadat('HZ–(MP–GP)', hz-(mp-gp), 'MP', mp)
+					}
+					else if (hz - (mp - gp) < 3) {						// soorat B-3
+						if (mp - gp > hz) //this if is added because there is a horror of seeing negative numbers
+							print_soorat(`${mp-gp} (difference of pakis) &gt; ${hz} (haiz)`, 'B-3')
+						else
+							print_soorat(`${hz} (haiz) - ${mp-gp} (difference of pakis) = ${hz-(mp-gp)} &lt; 3, `, 'B-3')
+						print_days(1, `${hz}`, 'haiz')
+						print_days(3, `${dm-hz}`, 'istihaza')
+						print_aadat('hz', hz, 'mp', mp)
+					}
+				}
+			}
+			// this sets listeners so that if any change happens in the input boxes,
+			// the inputHandler function is called. 
+			inputs.forEach(function (inp) { gid(inp).addEventListener('input', inputHandler) });
+			inputHandler(0);
+		}
+	</script>
+	<!-- This is where we keep the css currently. When done we will
+         move it out to the css file	-->
+	<style>
+		.hide { 
+			display: none; 
+		}
+	</style>
+  </head>
+  <body  encoding='utf8'>
+	<table>
+		<tr><td>Mawjooda Paki:</td><td><input type="text" id="mp" value="26"></td></tr>
+		<tr><td>Guzashta Paki:</td><td><input type="text" id="gp" value="19"></td></tr>
+		<tr><td>Dam:</td><td><input type="text" id="dm" value="14"></td></tr>
+		<tr><td>Haiz:</td><td><input type="text" id="hz" value="6"></td></tr>
+	</table>
+	<!-- div is for paragraphs, while span is for portions of lines -->
+	<p>Mawjooda Paki <span id="comp">&leq;</span> Guzashta Paki so Qism is <span id="AorB">A</span></p>
+	<p>The difference between Guzashta Paki and Mawjooda Paki is <span id="dif"></span></p>
+	<p>Because <span id="cond"></span> the Soorat is <span id="soorat"></span></p>
+	<p>Hukm is that out of <span id="dam"></span> days of dam:</p>
+	<ul>
+		<li id="hukm1">The first <span id="val1"></span> days are <span id="type1"></span></li>
+		<li id="hukm2" class="hide">The next  <span id="val2"></span> days are <span id="type2"></span></li>
+		<li id="hukm3">The last  <span id="val3"></span> days are <span id="type3"></span></li>
+	</ul>
+	<p>The Aadat for:</p>
+	<ul>
+		<li>Haiz <span id="samehz"></span> <span id="valhz"></span> days</li>
+		<li>Tuhr <span id="samegp"></span> <span id="valgp"></span> days</li>
+	</ul>
+	<script>start()</script>
+  </body>
+</html>
