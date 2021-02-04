@@ -147,8 +147,13 @@
 			inputHandler(0);
 		}
 
-		function getInputValues(){
-
+		function calculateDuration(){
+			var diff = Math.abs(new Date(gid("strtTime").value)- new Date(gid("endTime").value))/60000; //This gives the diff in minutes
+			var minutes = diff % 60;
+			diff = (diff - minutes)/60; //now diff is in hours
+			var hours = diff % 24;
+			var days = (diff - hours)/24;
+			gid("duration").innerHTML = `${days} days, ${hours} hours, ${minutes} minutes`;
 		}
 	</script>
 	<!-- This is where we keep the css currently. When done we will
@@ -182,15 +187,17 @@
 		<li>Tuhr <span id="samegp"></span> <span id="valgp"></span> days</li>
 	</ul>
 	<p>&nbsp;</p>
-	<p>-------------------------------------</p>
+	<hr/>
 	<p>&nbsp;</p>
 	<p>Duration Calculator</p>
 	<table>
-		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16"></td></tr>
-		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16"></td></tr>
+		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16" onchange="calculateDuration()"></td></tr>
+		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16" onchange="calculateDuration()"></td></tr>
 	</table>
-	<p>The duration is <span id="daysduration"></span>, <span id="hoursduration></span>, <span id="minutesduration"></span></p>
+	<p>The duration is <span id="duration"></span></p>
 
-	<script>start()</script>
+	<script>start();
+			calculateDuration();
+	</script>
   </body>
 </html>
