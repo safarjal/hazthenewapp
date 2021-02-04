@@ -165,6 +165,15 @@
 	</style>
   </head>
   <body  encoding='utf8'>
+	<p>Duration Calculator</p>
+	<table>
+		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16" onchange="calculateDuration()"></td></tr>
+		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16" onchange="calculateDuration()"></td></tr>
+	</table>
+	<p>The duration is <span id="duration"></span></p>
+
+	<hr/>
+
 	<table>
 		<tr><td>Mawjooda Paki:</td><td><input type="text" id="mp" value="26"></td></tr>
 		<tr><td>Guzashta Paki:</td><td><input type="text" id="gp" value="19"></td></tr>
@@ -189,13 +198,7 @@
 	<p>&nbsp;</p>
 	<hr/>
 	<p>&nbsp;</p>
-	<p>Duration Calculator</p>
-	<table>
-		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16" onchange="calculateDuration()"></td></tr>
-		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16" onchange="calculateDuration()"></td></tr>
-	</table>
-	<p>The duration is <span id="duration"></span></p>
-
+	
 	<script>start();
 			calculateDuration();
 	</script>
