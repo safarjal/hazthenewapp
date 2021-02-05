@@ -83,61 +83,86 @@
 				gid('samegp').innerHTML = namegp == 'gp' ? 'remains the same' : 'changes to';
 				gid('valgp').innerHTML = valgp
 			}
-			const inputs = ['mp', 'gp', 'dm', 'hz'];
-			// this function is called any time any of the four inputs are changed
+			const inputs = ['mpdays', 'mphours', 'mpminutes', 
+							'gpdays', 'gphours', 'gpminutes', 
+							'dmdays', 'dmhours', 'dmminutes', 
+							'hzdays', 'hzhours', 'hzminutes'];
+			// this function is called any time any of the four times 3 inputs are changed
 			// it updates the values of all the text in the html
 			const inputHandler = function(e) {
-				var [mp, gp, dm, hz] = inputs.map(function (inp) { return Number(gid(inp).value); })
-				gid('dam').innerHTML = dm;
+				var [mpdays, mphours, mpminutes, 
+					gpdays, gphours, gpminutes, 
+					dmdays, dmhours, dmminutes, 
+					hzdays, hzhours, hzminutes] = inputs.map(function (inp) { return Number(gid(inp).value); });
+				
+				var mp = mpdays + (mphours/24) + (mpminutes/(24*60));//These 4 lines convert everything to hours
+				var gp = gpdays + (gphours/24) + (gpminutes/(24*60));
+				var dm = dmdays + (dmhours/24) + (dmminutes/(24*60));
+				var hz = hzdays + (hzhours/24) + (hzminutes/(24*60));
+
+				function daysHoursMinutes (days){
+					days = days*24*60; //This is actually in minutes now
+					var minutes=days%60;								
+					days = (days - minutes)/60; //now days is in hours
+					var hours = days % 24;
+					var days = (days - hours)/24;
+					minutes=Math.round(minutes);
+					hours=Math.round(hours);
+					days=Math.round(days);
+					var returnStatement = `${days} days, ${hours} hours, ${minutes} minutes`;
+					return returnStatement;
+				}
+				
+				gid('dam').innerHTML = daysHoursMinutes(dm);
 				if (mp <= gp) {    //Qism A
 					gid('comp').innerHTML = '&leq;';
 					gid('AorB').innerHTML = 'A';
-					gid('dif').innerHTML = gp - mp;
+					gid('dif').innerHTML = daysHoursMinutes(gp - mp);
 					if (hz <= dm - (gp - mp)) {	                  // soorat A-1
-						print_soorat(`${dm} (dam) - ${gp-mp} (difference of pakis) = ${dm-(gp-mp)} &geq; ${hz} (haiz)`, 'A-1');
+						print_soorat(`${daysHoursMinutes(dm)} (dam) - ${daysHoursMinutes(gp-mp)} (difference of pakis) = ${daysHoursMinutes(dm-(gp-mp))} &geq; ${daysHoursMinutes(hz)} (haiz)`, 'A-1');
 						// if GP==MP, we would output 0 istihaza, not good!
 						// 0 istihaza is ok, for now. just no negative numbers, please
-						print_days(1, `${gp-mp}`,      'istihaza');
-						print_days(2, `${hz}`,            'haiz');
+						print_days(1, `${daysHoursMinutes(gp-mp)}`,      'istihaza');
+						print_days(2, `${daysHoursMinutes(hz)}`,            'haiz');
 						// what if DM = HZ + (GP-MP), then we would have 0 istihza, not good!
 						//0 istihaza is ok
-						print_days(3, `${dm-(gp-mp)-hz}`, 'istihaza');
-						print_aadat('hz', hz, 'gp', gp);
+						print_days(3, `${daysHoursMinutes(dm-(gp-mp)-hz)}`, 'istihaza');
+						print_aadat('hz', daysHoursMinutes(hz), 'gp', daysHoursMinutes(gp));
 					}
 					else if (3 <= dm-(gp-mp) && dm-(gp-mp) < hz) {  // soorat A-2
-						print_soorat(`${dm} (dam) - ${gp-mp} (difference of pakis) = ${dm-(gp-mp)} and 3 &leq; ${dm-(gp-mp)} &lt; ${hz} (haiz)`, 'A-2');
-						print_days(1, `${gp-mp}`, 'istihaza');
-						print_days(3, `${dm-(gp-mp)}`, 'haiz');
-						print_aadat('DM–(GP–MP)', dm-(gp-mp), 'gp', gp);
+						print_soorat(`${daysHoursMinutes(dm)} (dam) - ${daysHoursMinutes(gp-mp)} (difference of pakis) = ${daysHoursMinutes(dm-(gp-mp))} and 3 days &leq; ${daysHoursMinutes(dm-(gp-mp))} &lt; ${daysHoursMinutes(hz)} (haiz)`, 'A-2');
+						print_days(1, `${daysHoursMinutes(gp-mp)}`, 'istihaza');
+						print_days(3, `${daysHoursMinutes(dm-(gp-mp))}`, 'haiz');
+						print_aadat('DM–(GP–MP)', daysHoursMinutes(dm-(gp-mp)), 'gp', daysHoursMinutes(gp));
 					}
 					else if (dm - (gp - mp) < 3) {                  // soorat A-3
 						if (gp - mp > dm) //this if is added because there is a horror of seeing negative numbers
-							print_soorat(`${gp-mp} (difference of pakis) &gt; ${dm} (dam)`, 'A-3');
+							print_soorat(`${daysHoursMinutes(gp-mp)} (difference of pakis) &gt; ${daysHoursMinutes(dm)} (dam)`, 'A-3');
 						else 
-							print_soorat(`${dm} (dam) - ${gp-mp} (difference of pakis) = ${dm-(gp-mp)} &lt; 3`, 'A-3');
-						print_days(1, `${hz}`, 'haiz');
-						print_days(3, `${dm-hz}`, 'istihaza');
-						print_aadat('hz', hz, 'MP', mp);
+							print_soorat(`${daysHoursMinutes(dm)} (dam) - ${daysHoursMinutes(gp-mp)} (difference of pakis) = ${daysHoursMinutes(dm-(gp-mp))} &lt; 3 days`, 'A-3');
+						print_days(1, `${daysHoursMinutes(hz)}`, 'haiz');
+						print_days(3, `${daysHoursMinutes(dm-hz)}`, 'istihaza');
+						print_aadat('hz', daysHoursMinutes(hz), 'MP', daysHoursMinutes(mp));
 					}
 				}				
 				else {	// mp>gp qism B
 					gid('comp').innerHTML = '&gt;';
 					gid('AorB').innerHTML = 'B';
-					gid('dif').innerHTML = mp - gp;
+					gid('dif').innerHTML = daysHoursMinutes(mp - gp);
 					if (hz - (mp - gp) >= 3) {							// soorat B-2
-						print_soorat(`${hz} (haiz) - ${mp-gp} (difference of pakis) = ${hz-(mp-gp)} &geq; 3`,'B-2')
-						print_days(1, `${hz-(mp-gp)}`, 'haiz')
-						print_days(3, `${dm-(hz-(mp-gp))}`, 'istihaza')
-						print_aadat('HZ–(MP–GP)', hz-(mp-gp), 'MP', mp)
+						print_soorat(`${daysHoursMinutes(hz)} (haiz) - ${daysHoursMinutes(mp-gp)} (difference of pakis) = ${daysHoursMinutes(hz-(mp-gp))} &geq; 3 days`,'B-2')
+						print_days(1, `${daysHoursMinutes(hz-(mp-gp))}`, 'haiz')
+						print_days(3, `${daysHoursMinutes(dm-(hz-(mp-gp)))}`, 'istihaza')
+						print_aadat('HZ–(MP–GP)', daysHoursMinutes(hz-(mp-gp)), 'MP', daysHoursMinutes(mp))
 					}
 					else if (hz - (mp - gp) < 3) {						// soorat B-3
 						if (mp - gp > hz) //this if is added because there is a horror of seeing negative numbers
-							print_soorat(`${mp-gp} (difference of pakis) &gt; ${hz} (haiz)`, 'B-3')
+							print_soorat(`${daysHoursMinutes(mp-gp)} (difference of pakis) &gt; ${daysHoursMinutes(hz)} (haiz)`, 'B-3')
 						else
-							print_soorat(`${hz} (haiz) - ${mp-gp} (difference of pakis) = ${hz-(mp-gp)} &lt; 3, `, 'B-3')
-						print_days(1, `${hz}`, 'haiz')
-						print_days(3, `${dm-hz}`, 'istihaza')
-						print_aadat('hz', hz, 'mp', mp)
+							print_soorat(`${daysHoursMinutes(hz)} (haiz) - ${daysHoursMinutes(mp-gp)} (difference of pakis) = ${daysHoursMinutes(hz-(mp-gp))} &lt; 3, `, 'B-3')
+						print_days(1, `${daysHoursMinutes(hz)}`, 'haiz')
+						print_days(3, `${daysHoursMinutes(dm-hz)}`, 'istihaza')
+						print_aadat('hz', daysHoursMinutes(hz), 'mp', daysHoursMinutes(mp))
 					}
 				}
 			}
@@ -155,6 +180,15 @@
 			var days = (diff - hours)/24;
 			gid("duration").innerHTML = `${days} days, ${hours} hours, ${minutes} minutes`;
 		}
+
+		function addTime(){
+			var oldTime = new Date(gid("strtTime1").value)/60000; //This gives the date in minutes
+			var additionalTime = Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*12*Number(gid("addTimeDays").value); //This value is also in minutes
+			var newTime = (oldTime + additionalTime)*60000; //This value is in milisecond
+			
+			gid("addedTime").innerHTML = `${new Date(newTime)}`;
+		}
+
 	</script>
 	<!-- This is where we keep the css currently. When done we will
          move it out to the css file	-->
@@ -171,36 +205,62 @@
 		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16" onchange="calculateDuration()"></td></tr>
 	</table>
 	<p>The duration is <span id="duration"></span></p>
-
+	
+	<hr/>
+	<p>Add time to date</p>
+	<p>Start date and time: <input type="datetime-local" id="strtTime1" value="2021-02-10T15:16" onchange="addTime()"></p>
+	<table>
+		<tr><td></td><td>Days</td><td>Hours</td><td>Minutes</td></tr>
+		<tr><td>Add time:</td>
+			<td><input type="text" id="addTimeDays" value="1" onchange="addTime()"></td>
+			<td><input type="text" id="addTimeHours" value="1" onchange="addTime()"></td>
+			<td><input type="text" id="addTimeMinutes" value="1" onchange="addTime()"></td>
+		</tr>
+	</table>
+	<p>The end time is <span id="addedTime"></span></p>
 	<hr/>
 
 	<table>
-		<tr><td>Mawjooda Paki:</td><td><input type="text" id="mp" value="26"></td></tr>
-		<tr><td>Guzashta Paki:</td><td><input type="text" id="gp" value="19"></td></tr>
-		<tr><td>Dam:</td><td><input type="text" id="dm" value="14"></td></tr>
-		<tr><td>Haiz:</td><td><input type="text" id="hz" value="6"></td></tr>
+		<tr><td></td><td>Days</td><td>Hours</td><td>Minutes</td></tr>
+		<tr><td>Mawjooda Paki:</td><td><input type="text" id="mpdays" value="26"></td>
+			<td><input type="text" id="mphours" value="26"></td>
+			<td><input type="text" id="mpminutes" value="26"></td></tr>
+		<tr><td>Guzashta Paki:</td><td><input type="text" id="gpdays" value="19"></td>
+			<td><input type="text" id="gphours" value="19"></td>
+			<td><input type="text" id="gpminutes" value="19"></td>
+		</tr>
+		<tr><td>Dam:</td><td><input type="text" id="dmdays" value="14"></td>
+			<td><input type="text" id="dmhours" value="14"></td>
+			<td><input type="text" id="dmminutes" value="14"></td>
+		</tr>
+		<tr><td>Haiz:</td><td><input type="text" id="hzdays" value="6"></td>
+			<td><input type="text" id="hzhours" value="6"></td>
+			<td><input type="text" id="hzminutes" value="6"></td>
+		</tr>
 	</table>
 	<!-- div is for paragraphs, while span is for portions of lines -->
 	<p>Mawjooda Paki <span id="comp">&leq;</span> Guzashta Paki so Qism is <span id="AorB">A</span></p>
 	<p>The difference between Guzashta Paki and Mawjooda Paki is <span id="dif"></span></p>
 	<p>Because <span id="cond"></span> the Soorat is <span id="soorat"></span></p>
-	<p>Hukm is that out of <span id="dam"></span> days of dam:</p>
+	<p>Hukm is that out of <span id="dam"></span> of dam:</p>
 	<ul>
-		<li id="hukm1">The first <span id="val1"></span> days are <span id="type1"></span></li>
-		<li id="hukm2" class="hide">The next  <span id="val2"></span> days are <span id="type2"></span></li>
-		<li id="hukm3">The last  <span id="val3"></span> days are <span id="type3"></span></li>
+		<li id="hukm1">The first <span id="val1"></span> are <span id="type1"></span></li>
+		<li id="hukm2" class="hide">The next  <span id="val2"></span> are <span id="type2"></span></li>
+		<li id="hukm3">The last  <span id="val3"></span> are <span id="type3"></span></li>
 	</ul>
 	<p>The Aadat for:</p>
 	<ul>
-		<li>Haiz <span id="samehz"></span> <span id="valhz"></span> days</li>
-		<li>Tuhr <span id="samegp"></span> <span id="valgp"></span> days</li>
+		<li>Haiz <span id="samehz"></span> <span id="valhz"></span></li>
+		<li>Tuhr <span id="samegp"></span> <span id="valgp"></span></li>
 	</ul>
 	<p>&nbsp;</p>
 	<hr/>
 	<p>&nbsp;</p>
 	
-	<script>start();
-			calculateDuration();
+	<script>
+		start();
+		calculateDuration();
+		addTime();
 	</script>
   </body>
 </html>
