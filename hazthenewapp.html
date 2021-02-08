@@ -63,7 +63,7 @@
 		//  X1<0 DM,HZ = (-1,6) ?
 		
 		function gid(id) { return document.getElementById(id) }
-		function start () {
+		function start() {
 			// this defines a function called gid, which is equivalent to
 			// the builtin function document.getElementById. It is very
 			// often used, so a short name is nice
@@ -189,6 +189,32 @@
 			gid("addedTime").innerHTML = `${new Date(newTime)}`;
 		}
 
+		var dima = [];
+
+		function inputNewDam(){
+			var strtTimeOfDm = new Date(gid("strtTimeOfDm").value);
+			var endTimeOfDm = new Date (gid("endTimeOfDm").value);
+			var dam = [strtTimeOfDm, endTimeOfDm];
+			dima.push(dam);
+			printDima();
+		}
+
+		function printDima(){
+			var text = "";
+			for (var i=0;i<dima.length;i++) {
+				var dam = dima[i];
+				text += `<tr><td>${dam[0]}</td><td>${dam[1]}</td></tr>`;
+
+			}
+//			<tr><td>Start Time</td><td>End Time</td></tr>
+	
+			gid("dmprint").innerHTML = text;
+		}
+
+		function formatDate(){
+
+		}
+
 	</script>
 	<!-- This is where we keep the css currently. When done we will
          move it out to the css file	-->
@@ -223,19 +249,19 @@
 	<table>
 		<tr><td></td><td>Days</td><td>Hours</td><td>Minutes</td></tr>
 		<tr><td>Mawjooda Paki:</td><td><input type="text" id="mpdays" value="26"></td>
-			<td><input type="text" id="mphours" value="26"></td>
-			<td><input type="text" id="mpminutes" value="26"></td></tr>
+			<td><input type="text" id="mphours" value="0"></td>
+			<td><input type="text" id="mpminutes" value="0"></td></tr>
 		<tr><td>Guzashta Paki:</td><td><input type="text" id="gpdays" value="19"></td>
-			<td><input type="text" id="gphours" value="19"></td>
-			<td><input type="text" id="gpminutes" value="19"></td>
+			<td><input type="text" id="gphours" value="0"></td>
+			<td><input type="text" id="gpminutes" value="0"></td>
 		</tr>
 		<tr><td>Dam:</td><td><input type="text" id="dmdays" value="14"></td>
-			<td><input type="text" id="dmhours" value="14"></td>
-			<td><input type="text" id="dmminutes" value="14"></td>
+			<td><input type="text" id="dmhours" value="0"></td>
+			<td><input type="text" id="dmminutes" value="0"></td>
 		</tr>
 		<tr><td>Haiz:</td><td><input type="text" id="hzdays" value="6"></td>
-			<td><input type="text" id="hzhours" value="6"></td>
-			<td><input type="text" id="hzminutes" value="6"></td>
+			<td><input type="text" id="hzhours" value="0"></td>
+			<td><input type="text" id="hzminutes" value="0"></td>
 		</tr>
 	</table>
 	<!-- div is for paragraphs, while span is for portions of lines -->
@@ -256,6 +282,21 @@
 	<p>&nbsp;</p>
 	<hr/>
 	<p>&nbsp;</p>
+	<p>Enter Start Time and End Time of Dam</p>
+	<table>
+		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTimeOfDm" value="2021-02-10T15:16"></td></tr>
+		<tr><td>End time:</td><td><input type="datetime-local" id="endTimeOfDm" value="2021-05-10T15:16"></td></tr>
+	</table>
+	<input type="button" value="Submit" onclick="inputNewDam()">
+
+	<hr/>
+
+	<table>
+		<tr><td>Start Time</td><td>End Time</td></tr>
+		<span id="dmprint"></span>
+
+	</table>
+	
 	
 	<script>
 		start();
