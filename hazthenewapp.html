@@ -247,28 +247,84 @@
     				break;
   				}
 			}
-			printValues(value, type);
+			printValues(value, type); //Step 1: Write all the info with arrows
+			if (type = 2){ //convert spots to dam
+				type =0;
+			}
+			putValueInPeriodsArray(value,type);
+			fixPeriodsArray();
+			printPeriodsArray();
 		}
 		var textToPrint="";
+		var periods = [];
+
+		function putValueInPeriodsArray (v,typ){
+			var period = [v,typ];
+			periods.push(period);
+		}
+
+		function fixPeriodsArray(){
+			//Go through all the periods. Join all muttasil things of the same type.
+			for (var i = 0; i <= periods.length - 2; i++) {
+				var currentPeriod = periods[i];
+				var nextPeriod = periods[(i+1)];
+				if (currentPeriod[1]=nextPeriod[1]){//if type of current and next period is same
+					currentPeriod[0]=currentPeriod[0]+nextPeriod[0]; //add their values
+					periods.splice(i+1,1);//remove next period
+
+				}
+			}
+		}
+
+		function printPeriodsArray(){
+			var periodsoutput = "Solution: <br>";
+			for (var i = 0; i <= periods.length; i++) {
+				var period = periods[i];
+				if (period[1]==1){//tuhur
+					periodsoutput = `${periodsoutput} ${period[0]} tuhur <br>`;
+
+
+				}else{//dam
+					if (period[0]==0){//single spot
+						periodsoutput = `${periodsoutput} spot <br>`;
+
+					}else{
+						periodsoutput = `${periodsoutput} ${period[0]} dam <br>`;
+					}
+
+				}
+			}
+			gid("hall").innerHTML = `${periodsoutput}`
+
+		}
 
 		function printValues(value,t){
-			if (t = 0){//dam
-				textToPrint=`${textToPrint} then ${value} days dam`;
+			if (t == 0){//dam
+				textToPrint=`${textToPrint} &rarr; ${value} days dam`;
 
 
-			}else if (t = 1){//tuhur
-				textToPrint=`${textToPrint} then ${value} days tuhur`;
+			}else if (t == 1){//tuhur
+				textToPrint=`${textToPrint} &rarr; ${value} days tuhur`;
 
 			}else{//spot
-				if (value = 0){//just a dhabba
-					textToPrint=`${textToPrint} then a spot`;
+				if (value == 0){//just a dhabba
+					textToPrint=`${textToPrint} &rarr; a spot`;
 
 				}else{
-					textToPrint=`${textToPrint} then ${value} days of spotting`;
+					textToPrint=`${textToPrint} &rarr; ${value} days of spotting`;
 
 				}
 
-			} 
+			}
+			if (textToPrint.slice(0,8)== " &rarr; ") {
+				textToPrint=textToPrint.slice(8);
+			}
+
+			gid("output").innerHTML = `${textToPrint}`;
+		}
+
+		function resetDimaAthaar(){
+			textToPrint = "";
 			gid("output").innerHTML = `${textToPrint}`;
 		}
 
@@ -297,6 +353,7 @@
 	<input type="button" value="Reset" onclick="resetDimaAthaar()"><br>
 
 	<p><span id="output"></span></p>
+	<p><span id="hall"></span></p>
 
 
 
