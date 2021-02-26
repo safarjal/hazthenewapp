@@ -210,6 +210,66 @@
 			td2.appendChild(document.createTextNode(`${arguments[1]}`));
 			row.appendChild(td2)
 			gid("output").appendChild(row);
+
+			makeDurationsArrayOfDmAndPaki();
+		}
+
+		function makeDurationsArrayOfDmAndPaki(){
+			var durationsarray = [];
+			for (var i = 0; i<dima.length; i++){
+				var dam = dima[i];
+				var duration = 0;
+				if (i>0){
+					var previousdam = dima[i-1];
+					duration = dam[0]-previousdam[1];
+					durationsarray.push([duration, 1]);//1 means tuhur
+				}
+				duration = dam[1] - dam[0];
+				durationsarray.push([duration, 2]); //2 means dam
+
+			}
+		}
+
+		function submitDimaAthaar(){
+			getValues();
+		}
+
+		function getValues(){
+			var value = gid("numberofdays").value;
+			var type = 5;//5 is not a type
+			var damTuhurSpot = document.getElementsByName("damtuhurspot");
+			for (var i = 0, length = damTuhurSpot.length; i < length; i++) {
+ 				 if (damTuhurSpot[i].checked) {
+    				// do whatever you want with the checked radio
+    				type = damTuhurSpot[i].value;
+
+  					// only one radio can be logically checked, don't check the rest
+    				break;
+  				}
+			}
+			printValues(value, type);
+		}
+		var textToPrint="";
+
+		function printValues(value,t){
+			if (t = 0){//dam
+				textToPrint=`${textToPrint} then ${value} days dam`;
+
+
+			}else if (t = 1){//tuhur
+				textToPrint=`${textToPrint} then ${value} days tuhur`;
+
+			}else{//spot
+				if (value = 0){//just a dhabba
+					textToPrint=`${textToPrint} then a spot`;
+
+				}else{
+					textToPrint=`${textToPrint} then ${value} days of spotting`;
+
+				}
+
+			} 
+			gid("output").innerHTML = `${textToPrint}`;
 		}
 
 	</script>
@@ -222,6 +282,27 @@
 	</style>
   </head>
   <body  encoding='utf8'>
+  	<p>Dimaa and At-haar</p>
+  	<p>Please input dimaa and at-haar in order, starting from the earliest. To enter just a spot, put the value as 0 a and check spot. For several days of spotting, put the number of days in the value, and check spot.</p>
+
+	<input type="text" id="numberofdays" value="0"><label for="numberofdays">Days</label><br>
+	<input type="radio" id="dam1" name="damtuhurspot" value="0">
+	<label for="dam1">Dam</label><br>
+	<input type="radio" id="tuhur1" name="damtuhurspot" value="1">
+	<label for="tuhur1">Tuhur</label><br>
+	<input type="radio" id="spot1" name="damtuhurspot" value="2">
+	<label for="spot1">Spot</label><br>
+
+	<input type="button" value="Submit" onclick="submitDimaAthaar()">
+	<input type="button" value="Reset" onclick="resetDimaAthaar()"><br>
+
+	<p><span id="output"></span></p>
+
+
+
+
+
+  	<hr/>
 	<p>Duration Calculator</p>
 	<table>
 		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16" onchange="calculateDuration()"></td></tr>
