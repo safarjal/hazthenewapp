@@ -248,43 +248,77 @@
   				}
 			}
 			printValues(value, type); //Step 1: Write all the info with arrows
-			if (type = 2){ //convert spots to dam
+			if (type == 2){ //convert spots to dam
 				type =0;
 			}
 			putValueInPeriodsArray(value,type);
 			fixPeriodsArray();
-			printPeriodsArray();
 		}
 		var textToPrint="";
 		var periods = [];
 
 		function putValueInPeriodsArray (v,typ){
-			var period = [v,typ];
+			var period = [+v,+typ]; //the plus is to avoid storing them as strings
 			periods.push(period);
 		}
 
 		function fixPeriodsArray(){
+			//create a copy of periods array. don't mess with the original
+			var fixedPeriods = [];
+			for (var i = 0; i < periods.length; i++) {
+				var period = periods[i];
+				fixedPeriods.push(period);
+			}
+			
 			//Go through all the periods. Join all muttasil things of the same type.
-			for (var i = 0; i <= periods.length - 2; i++) {
-				var currentPeriod = periods[i];
-				var nextPeriod = periods[(i+1)];
-				if (currentPeriod[1]=nextPeriod[1]){//if type of current and next period is same
-					currentPeriod[0]=currentPeriod[0]+nextPeriod[0]; //add their values
-					periods.splice(i+1,1);//remove next period
-
+			for (var i = 0; i < fixedPeriods.length - 1; i++) {
+				var currentPeriod = fixedPeriods[i];
+				var nextPeriod = fixedPeriods[(i+1)];
+				if (currentPeriod[1]==nextPeriod[1]){//if type of current and next period is same
+					currentPeriod[0]= currentPeriod[0] + nextPeriod[0]; //add their values
+					fixedPeriods.splice(i+1,1);//remove next period
+					fixedPeriods[i] = currentPeriod; //put changed period in here
 				}
 			}
+			//Go through all the periods. mark all tuhurs of less than 15 days, surrounded by dam on either side, as dam
+			for (var i = 1; i < fixedPeriods.length - 1; i++) {
+				var previousPeriod = fixedPeriods[i-1];
+				var currentPeriod = fixedPeriods[i];
+				var nextPeriod = fixedPeriods[(i+1)];
+				if (currentPeriod[0]<15 && currentPeriod[1]==1 ){//if value is less than 15 and type is tuhur
+
+					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
+					fixedPeriods.splice(i, 2); //remove current period, and next period
+					fixedPeriods[i-1] = previousPeriod; //put changed period in here
+					i=i-1;//move i one back
+				}
+			}
+			//Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
+			for (var i = 1; i < fixedPeriods.length - 1; i++) {
+				var previousPeriod = fixedPeriods[i-1];
+				var currentPeriod = fixedPeriods[i];
+				var nextPeriod = fixedPeriods[(i+1)];
+				if (currentPeriod[0]<3 && currentPeriod[1]==0 ){//if value is less than 3 and type is haiz
+
+					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
+					previousPeriod[1]= 2; // type 2 is for tuhur e faasid
+					fixedPeriods.splice(i, 2); //remove current period, and next period
+					fixedPeriods[i-1] = previousPeriod; //put changed period in here
+					i=i-1;//move i one back
+				}
+			}					
+			printPeriodsArray(fixedPeriods);
 		}
 
-		function printPeriodsArray(){
+		function printPeriodsArray(fixedPeriods){
 			var periodsoutput = "Solution: <br>";
-			for (var i = 0; i <= periods.length; i++) {
-				var period = periods[i];
+			for (var i = 0; i < fixedPeriods.length; i++) {
+				var period = fixedPeriods[i];
 				if (period[1]==1){//tuhur
 					periodsoutput = `${periodsoutput} ${period[0]} tuhur <br>`;
 
 
-				}else{//dam
+				}else if(period[1]==0){//dam
 					if (period[0]==0){//single spot
 						periodsoutput = `${periodsoutput} spot <br>`;
 
@@ -292,6 +326,8 @@
 						periodsoutput = `${periodsoutput} ${period[0]} dam <br>`;
 					}
 
+				}else if(period[1]==2){//tuhure faasid
+					periodsoutput = `${periodsoutput} ${period[0]} tuhur e faasid <br>`;
 				}
 			}
 			gid("hall").innerHTML = `${periodsoutput}`
