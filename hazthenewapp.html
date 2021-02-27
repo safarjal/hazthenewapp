@@ -236,7 +236,10 @@
 
 		function getValues(){
 			var value = gid("numberofdays").value;
-			var type = 5;//5 is not a type
+			var type = 5;//5 is not a type if it turns up 5, there's an error
+			if (value == "istimrar"){
+				value = -1; //we will use negative one for istimrar
+			}
 			var damTuhurSpot = document.getElementsByName("damtuhurspot");
 			for (var i = 0, length = damTuhurSpot.length; i < length; i++) {
  				 if (damTuhurSpot[i].checked) {
@@ -246,6 +249,9 @@
   					// only one radio can be logically checked, don't check the rest
     				break;
   				}
+			}
+			if (value == -1){//if it's istimrar
+				type = 0; //if it was set to something else, it should be autocorrected to dam. someone made a mistake
 			}
 			printValues(value, type); //Step 1: Write all the info with arrows
 			if (type == 2){ //convert spots to dam
@@ -285,9 +291,14 @@
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
 				if (currentPeriod[1]==nextPeriod[1]){//if type of current and next period is same
-					currentPeriod[0]= currentPeriod[0] + nextPeriod[0]; //add their values
-					fixedPeriods.splice(i+1,1);//remove next period
-					fixedPeriods[i] = currentPeriod; //put changed period in here
+					if(nextPeriod[0]==-1 && nextPeriod[1]==0){//add check for istimrar
+						//istimrar, with a dam behind it all becomes istimrar, so delete current period
+						fixedPeriods.splice(i,1);
+					}else{
+						currentPeriod[0]= currentPeriod[0] + nextPeriod[0]; //add their values
+						fixedPeriods.splice(i+1,1);//remove next period
+						fixedPeriods[i] = currentPeriod; //put changed period in here
+					}
 				}
 			}
 			//Go through all the periods. mark all tuhurs of less than 15 days, surrounded by dam on either side, as dam
@@ -296,11 +307,16 @@
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
 				if (currentPeriod[0]<15 && currentPeriod[1]==1 ){//if value is less than 15 and type is tuhur
-
-					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
-					fixedPeriods.splice(i, 2); //remove current period, and next period
-					fixedPeriods[i-1] = previousPeriod; //put changed period in here
-					i=i-1;//move i one back
+					if(nextPeriod[0]==-1 && nextPeriod[1]==0){//add check for istimrar
+						//it all becomes istimrar, so delete current period, and the one behind it.
+						fixedPeriods.splice(i-1, 2); //remove previous period, and current period
+						i=i-1;
+					}else{
+						previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
+						fixedPeriods.splice(i, 2); //remove current period, and next period
+						fixedPeriods[i-1] = previousPeriod; //put changed period in here
+						i=i-1;//move i one back
+					}
 				}
 			}
 			//Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
@@ -308,7 +324,7 @@
 				var previousPeriod = fixedPeriods[i-1];
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
-				if (currentPeriod[0]<3 && currentPeriod[1]==0 ){//if value is less than 3 and type is haiz
+				if (currentPeriod[0]<3 && currentPeriod[0]>-1 && currentPeriod[1]==0 ){//if value is less than 3 (but not -1, which is istimrar!!) and type is dam
 
 					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
 					previousPeriod[1]= 3; // type 3 is for tuhur e faasid
@@ -332,6 +348,8 @@
 					if (period[0]==0){//single spot
 						periodsoutput = `${periodsoutput} spot <br>`;
 
+					}else if(period[0]==-1){//istimrar
+						periodsoutput = `${periodsoutput} istimrar <br>`;
 					}else{
 						periodsoutput = `${periodsoutput} ${period[0]} dam <br>`;
 					}
@@ -346,7 +364,11 @@
 
 		function printValues(value,t){
 			if (t == 0){//dam
-				textToPrint=`${textToPrint} &rarr; ${value} days dam`;
+				if (value == -1){//checking for istimrar
+					textToPrint=`${textToPrint} &rarr; istimrar`;
+				}else{
+					textToPrint=`${textToPrint} &rarr; ${value} days dam`;
+				}
 
 
 			}else if (t == 1){//tuhur
@@ -362,7 +384,7 @@
 				}
 
 			}
-			if (textToPrint.slice(0,8)== " &rarr; ") {
+			if (textToPrint.slice(0,8)== " &rarr; ") {//if it starts with an arrow, remove it
 				textToPrint=textToPrint.slice(8);
 			}
 
@@ -372,6 +394,9 @@
 		function resetDimaAthaar(){
 			textToPrint = "";
 			gid("output").innerHTML = `${textToPrint}`;
+			gid("hall").innerHTML = ``;
+			periods.splice(0,periods.length);
+			gid("numberofdays").value=`0`;
 		}
 
 	</script>
@@ -385,7 +410,7 @@
   </head>
   <body  encoding='utf8'>
   	<p>Dimaa and At-haar</p>
-  	<p>Please input dimaa and at-haar in order, starting from the earliest. To enter just a spot, put the value as 0 a and check spot. For several days of spotting, put the number of days in the value, and check spot.</p>
+  	<p>Please input dimaa and at-haar in order, starting from the earliest. To enter just a spot, put the value as 0, check spot and click submit. For several days of spotting, put the number of days in the value, check spot, and click submit. To enter istimraar, type istimrar in the value, check dam, and click submit.</p>
 
 	<input type="text" id="numberofdays" value="0"><label for="numberofdays">Days</label><br>
 	<input type="radio" id="dam1" name="damtuhurspot" value="0">
