@@ -237,8 +237,9 @@
 		function getValues(){
 			var value = gid("numberofdays").value;
 			var type = 5;//5 is not a type if it turns up 5, there's an error
-			if (value == "istimrar"){
+			if (value == "istimrar" || value == "istimraar"){
 				value = -1; //we will use negative one for istimrar
+				gid("submitButton").disabled=true; //disable submit button, no additional values allowed
 			}
 			var damTuhurSpot = document.getElementsByName("damtuhurspot");
 			for (var i = 0, length = damTuhurSpot.length; i < length; i++) {
@@ -402,6 +403,8 @@
 			gid("hall").innerHTML = ``;
 			periods.splice(0,periods.length);
 			gid("numberofdays").value=`0`;
+			gid("submitButton").disabled=false;
+
 		}
 
 	</script>
@@ -425,7 +428,7 @@
 	<input type="radio" id="spot1" name="damtuhurspot" value="2">
 	<label for="spot1">Spot</label><br>
 
-	<input type="button" value="Submit" onclick="submitDimaAthaar()">
+	<input type="button" value="Submit" id="submitButton" onclick="submitDimaAthaar()">
 	<input type="button" value="Reset" onclick="resetDimaAthaar()"><br>
 
 	<p><span id="output"></span></p>
