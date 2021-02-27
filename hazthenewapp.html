@@ -262,14 +262,24 @@
 			periods.push(period);
 		}
 
+		function copy(aObject) {
+ 			if (!aObject) {
+ 			   return aObject;
+ 			}
+ 			let v;
+ 			let bObject = Array.isArray(aObject) ? [] : {};
+ 			for (const k in aObject) {
+ 				v = aObject[k];
+ 				bObject[k] = (typeof v === "object") ? copy(v) : v;
+ 			}
+ 			return bObject;
+ 		}
+
 		function fixPeriodsArray(){
 			//create a copy of periods array. don't mess with the original
-			var fixedPeriods = [];
-			for (var i = 0; i < periods.length; i++) {
-				var period = periods[i];
-				fixedPeriods.push(period);
-			}
+			var fixedPeriods = copy(periods);
 			
+
 			//Go through all the periods. Join all muttasil things of the same type.
 			for (var i = 0; i < fixedPeriods.length - 1; i++) {
 				var currentPeriod = fixedPeriods[i];
@@ -301,7 +311,7 @@
 				if (currentPeriod[0]<3 && currentPeriod[1]==0 ){//if value is less than 3 and type is haiz
 
 					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
-					previousPeriod[1]= 2; // type 2 is for tuhur e faasid
+					previousPeriod[1]= 3; // type 3 is for tuhur e faasid
 					fixedPeriods.splice(i, 2); //remove current period, and next period
 					fixedPeriods[i-1] = previousPeriod; //put changed period in here
 					i=i-1;//move i one back
@@ -326,7 +336,7 @@
 						periodsoutput = `${periodsoutput} ${period[0]} dam <br>`;
 					}
 
-				}else if(period[1]==2){//tuhure faasid
+				}else if(period[1]==3){//tuhure faasid
 					periodsoutput = `${periodsoutput} ${period[0]} tuhur e faasid <br>`;
 				}
 			}
