@@ -250,6 +250,10 @@
     				break;
   				}
 			}
+			if (value == 0 && type != 2){//if the type is not spot, the value shouldn't be zero. if it is, it's a mistake. do not do anything else
+				return;
+
+			}
 			if (value == -1){//if it's istimrar
 				type = 0; //if it was set to something else, it should be autocorrected to dam. someone made a mistake
 			}
