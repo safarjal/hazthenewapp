@@ -237,7 +237,7 @@
 		function getValues(){
 			var value = gid("numberofdays").value;
 			var type = 5;//5 is not a type if it turns up 5, there's an error
-			if (value == "istimrar" || value == "istimraar" || value == " istimraar"|| value == "istimraar " || value == " istimraar " || value == " istimrar" || value == "istimrar " || value == " istimrar "){//alternative spellings for idiot proofing
+			if (value == "istimrar" || value == "istimraar" || value == " istimraar"|| value == "istimraar " || value == " istimraar " || value == " istimrar" || value == "istimrar " || value == " istimrar " || value == "Istimrar" || value == "Istimraar" || value == " Istimraar"|| value == "Istimraar " || value == " Istimraar " || value == " Istimrar" || value == "Istimrar " || value == " Istimrar "){//alternative spellings for idiot proofing
 				value = -1; //we will use negative one for istimrar
 				gid("submitButton").disabled=true; //disable submit button, no additional values allowed
 			}
