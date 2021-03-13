@@ -289,20 +289,16 @@
 		function fixPeriodsArray(){
 			//create a copy of periods array. don't mess with the original
 			var fixedPeriods = copy(periods);
-			var breadcrumbs = [];
 
-			//Go through all the periods. Join all muttasil things of the same type.
+			//Step 0: Go through all the periods. Join all muttasil things of the same type.
 			for (var i = 0; i < fixedPeriods.length - 1; i++) {
-				breadcrumbs.push(""); //there will be as many elements in breadcrumbs as there are in fixed periods.
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
 				if (currentPeriod[1]==nextPeriod[1]){//if type of current and next period is same
 					if(nextPeriod[0]==-1 && nextPeriod[1]==0){//add check for istimrar. istimrar has 0 length, and it's type is -1
 						//istimrar, with a dam behind it all becomes istimrar, so delete current period
 						fixedPeriods.splice(i,1);
-						breadcrumbs[i]= `${breadcrumbs[i]}, ${currentPeriod[0]} + istimrar`;
 					}else{
-						breadcrumbs[i] = `${breadcrumbs[i]}, ${currentPeriod[0]} + ${nextPeriod[0]} = ${currentPeriod[0] + nextPeriod[0]}`;
 						currentPeriod[0]= currentPeriod[0] + nextPeriod[0]; //add their values
 						fixedPeriods.splice(i+1,1);//remove next period
 						fixedPeriods[i] = currentPeriod; //put changed period in here
@@ -310,22 +306,17 @@
 					i=i-1;
 				}
 			}
-			//Go through all the periods. mark all tuhurs of less than 15 days, surrounded by dam on either side, as dam
+			//Step 1: Go through all the periods. mark all tuhurs of less than 15 days, surrounded by dam on either side, as dam
 			for (var i = 1; i < fixedPeriods.length - 1; i++) {
 				var previousPeriod = fixedPeriods[i-1];
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
 				if (currentPeriod[0]<15 && currentPeriod[1]==1 ){//if value is less than 15 and type is tuhur
 					if(nextPeriod[0]==-1 && nextPeriod[1]==0){//add check for istimrar
-						breadcrumbs[i-1] = `${breadcrumbs[i-1]}, ${breadcrumbs[i]}, ${breadcrumbs[i+1]}, ${previousPeriod[0]} + ${currentPeriod[0]} + istimrar = istimrar`;
-						breadcrumbs.splice(i, 2);
 						//it all becomes istimrar, so delete current period, and the one behind it.
 						fixedPeriods.splice(i-1, 2); //remove previous period, and current period
 						i=i-1;
 					}else{
-						breadcrumbs[i-1] = `${breadcrumbs[i-1]}, ${breadcrumbs[i]}, ${breadcrumbs[i+1]}, ${previousPeriod[0]} + ${currentPeriod[0]} + ${nextPeriod[0]} = ${previousPeriod[0] + currentPeriod[0] + nextPeriod[0]}`;
-						breadcrumbs.splice(i, 2);
-
 						previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
 						fixedPeriods.splice(i, 2); //remove current period, and next period
 						fixedPeriods[i-1] = previousPeriod; //put changed period in here
@@ -333,14 +324,12 @@
 					}
 				}
 			}
-			//Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
+			//Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
 			for (var i = 1; i < fixedPeriods.length - 1; i++) {
 				var previousPeriod = fixedPeriods[i-1];
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
 				if (currentPeriod[0]<3 && currentPeriod[0]>-1 && currentPeriod[1]==0 ){//if value is less than 3 (but not -1, which is istimrar!!) and type is dam
-					breadcrumbs[i-1] = `${breadcrumbs[i-1]}, ${breadcrumbs[i]}, ${breadcrumbs[i+1]}, ${previousPeriod[0]} + ${currentPeriod[0]} + ${nextPeriod[0]} = ${previousPeriod[0] + currentPeriod[0] + nextPeriod[0]}`;
-						breadcrumbs.splice(i, 2);
 
 					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
 					previousPeriod[1]= 3; // type 3 is for tuhur e faasid
@@ -349,31 +338,21 @@
 					i=i-1;//move i one back
 				}
 			}
-			//Go through all the periods. Find a period that is longer than 10. Solve it.
-			//By this point, all previous periods must be alternating tuhur haz. some tuhurs could be faasid
+			//Step 3: Go through them all in order, fixing each period longer than 10, on the way.
+			var aadatHaiz = -1;
+			var aadatTuhr = -1;
+
 			for (var i = 1; i < fixedPeriods.length; i++) {
 				var currentPeriod = fixedPeriods[i];
 				var previousPeriod = fixedPeriods[i-1];
-				if (currentPeriod[0]>10 && currentPeriod[1] == 0){//type 0 is dam, value is more than 10
-					//find last aadat
-					var aadatHaiz = -1; //-1 indicates there was no aadat
-					var aadatTuhr = -1; //-1 indicates there was no aadat
-					for (var j = i-2; j>=0; j--){//i is current dam. behind it is mawjoodah paki, the first possible dam is behind this
-						var currentAadatPeriod = fixedPeriods[j];
-						if (currentAadatPeriod[1]==0 && currentAadatPeriod[0]>=3 && currentAadatPeriod[0]<=10){//if we come accross a correct dam
-							aadatHaiz = currentAadatPeriod[0];
-							break;
-						}
+				if (currentPeriod[0]<=10 && currentPeriod[1] == 0){//if we pass by a correct haz, put it in aadat
+					aadatHaiz = currentPeriod[0];
+					if (previousPeriod[1] == 1){//aadat tuhr must be the last tuhr-e sahih followed by a haiz of less than 10
+						aadatTuhr = previousPeriod[0];
 					}
-					for (var j = i-2; j>=0; j--){//i is current period, a period of dam. immediately behind it is mawjoodah paki. aadat of tuhur must be behind this
-						var currentAadatPeriod = fixedPeriods[j];
-						if (currentAadatPeriod[1]==1 && currentAadatPeriod[0]>=15){//anything marked with a 1 isn't tuhur faasid.
-							aadatTuhr = currentAadatPeriod[0];
-							break;
-						}
-					}
-					if (aadatHaiz==-1 || aadatTuhr==-1){
-						//there is no aadat here
+				}
+				if (currentPeriod[0]>10 && currentPeriod[1] == 0){
+					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
 						break;
 					}else{//we have both aadaat
 						var mp = previousPeriod[0];
@@ -381,35 +360,48 @@
 						var dm = currentPeriod[0];
 						var hz = aadatHaiz;
 						var result = solveDmBiggerThanTen(mp,gp,dm,hz);
-						if (result[0]>0){//there is an istihaza behind it
-							//mark tuhur behind it as faasid
-							//as they haven't told us to do it, for the moment, I'm not adding to the amount of the tuhur behind it. I probably should, though.
-							//I'm going to
-							previousPeriod[0] = previousPeriod[0] + result[0];
-							previousPeriod[1] = 3; //tuhr e faaasid
-							fixedPeriods[i-1]=previousPeriod;
+						// if (result[0]>0){//there is an istihaza behind it
+						// 	//mark tuhur behind it as faasid
+						// 	//this is unnecessary. won't do it
+						// }
+						if (result[3] == 1 && previousPeriod[1] == 1){
+							aadatTuhr == previousPeriod[0];//aadatTuhr was gp, only changes to mp if not faasid
 						}
+
 						if (result[2]>0){//there is an istihaza after it
-							//mark tuhur in front of it as faasid.
-							//add it's amount to tuhur in front of it
-							if (i < fixedPeriods.length-1){//there is a paki in front of it. 
-								var nextPeriod=fixedPeriods[i+1];
-								nextPeriod[0] = nextPeriod[0] + result[2]; //add istihaza to it
-								nextPeriod[1] = 3;//mark it as tuhr faasid
-								fixedPeriods[i+1] = nextPeriod;
-							}else{//there is no paki in front of it
-								//create a new period
-								var nextPeriod = [result[2], 3];
-								fixedPeriods.push(nextPeriod);
+							//solving extremely long periods here
+							if (result[2]<aadatTuhr+3){
+								//add it's amount to tuhur in front of it
+								if (i < fixedPeriods.length-1){//there is a paki in front of it. 
+									var nextPeriod=fixedPeriods[i+1];
+									nextPeriod[0] = nextPeriod[0] + result[2]; //add istihaza to it
+									nextPeriod[1] = 3;//mark it as tuhr faasid
+									fixedPeriods[i+1] = nextPeriod;
+								}else{//there is no paki in front of it
+									//create a new period
+									var nextPeriod = [result[2], 3];
+									fixedPeriods.push(nextPeriod);
+								}
+							}else{//if it's greater than or equal aadat of tuhr +3, there is another period going to happen here
+								var nextPeriod = [result[2]-aadatTuhr, 0];
+								fixedPeriods.splice(i+1,0,nextPeriod);//create new dam
+								nextPeriod = [aadatTuhr, 3];
+								fixedPeriods.splice(i+1,0,nextPeriod);//create istihaza
+
 							}
 						}
+
+
 						currentPeriod[0]= result[1]; //resize this to haz
 						fixedPeriods[i] = currentPeriod;
+						aadatHaiz = result[1]; //update aadat of haiz
 					}
 				}
+
+
 			}
 
-			printPeriodsArray(fixedPeriods, breadcrumbs);
+			printPeriodsArray(fixedPeriods);
 		}
 
 		function solveDmBiggerThanTen(mp, gp, dm, hz){
@@ -422,6 +414,7 @@
 			var istihazaBefore = 0;
 			var haiz = 0;
 			var istihazaAfter = 0;
+			var aadatTuhr = -1; // 0 for gp, 1 for mp
 
 			if (mp <= gp) {    //Qism A
 				if (hz <= dm - (gp - mp)) {	                  // soorat A-1
@@ -431,18 +424,21 @@
 					istihazaBefore = gp-mp;
 					haiz = hz;
 					istihazaAfter = dm-(gp-mp)-hz;
+					aadatTuhr = 0;
 				}
 				else if (3 <= dm-(gp-mp) && dm-(gp-mp) < hz) {  // soorat A-2
 					soorat = 2;
 					istihazaBefore = gp-mp;
 					haiz = dm-(gp-mp);
 					istihazaAfter = 0;
+					aadatTuhr = 0;
 				}
 				else if (dm - (gp - mp) < 3) {                  // soorat A-3
 					soorat = 3;
 					istihazaBefore = 0;
 					haiz = hz;
 					istihazaAfter = dm-hz;
+					aadatTuhr = 1;
 				}
 			}else {	// mp>gp qism B
 				if (hz - (mp - gp) >= 3) {							// soorat B-2
@@ -450,59 +446,44 @@
 					istihazaBefore = 0;
 					haiz = hz-(mp-gp);
 					istihazaAfter = dm-(hz-(mp-gp));
+					aadatTuhr = 1;
 				}else if (hz - (mp - gp) < 3) {						// soorat B-3
 					soorat = 6;
 					istihazaBefore = 0;
 					haiz = hz;
 					istihazaAfter = dm-hz;
+					aadatTuhr = 1;
 				}
 			}
 			answer.push(istihazaBefore); //istihaza before
 			answer.push(haiz); //haiz
 			answer.push(istihazaAfter) //istihaza after
+			answer.push(aadatTuhr); //adat of tuhr, 0 if no change gp, 1 if change, mp
 			answer.push(soorat);
 			return(answer);
 		}
 
-		function MakeRowInHallTable(){
-			var row = document.createElement('tr');
-			var td1 = document.createElement('td');
-			td1.appendChild(document.createTextNode(`${arguments[0]}`));
-			row.appendChild(td1);
-			var td2 = document.createElement('td');
-			td2.appendChild(document.createTextNode(`${arguments[1]}`));
-			row.appendChild(td2);
-			gid("hall1").appendChild(row);
-
-		}
-
-		function printPeriodsArray(fixedPeriods, breadcrumbs){
+		function printPeriodsArray(fixedPeriods){
 			var periodsoutput = "Solution: <br>";
-			MakeRowInHallTable("Solution: ", "");
 			for (var i = 0; i < fixedPeriods.length; i++) {
 				var period = fixedPeriods[i];
 				if (period[1]==1){//tuhur
 					periodsoutput = `${periodsoutput} ${period[0]} tuhur <br>`;
-					MakeRowInHallTable(`${period[0]} tuhur`, breadcrumbs[i]);
 
 
 				}else if(period[1]==0){//dam
 					if (period[0]==0){//single spot
 						periodsoutput = `${periodsoutput} spot <br>`;
-						MakeRowInHallTable(`a spot`,breadcrumbs[i]);
 
 
 					}else if(period[0]==-1){//istimrar
 						periodsoutput = `${periodsoutput} istimrar <br>`;
-						MakeRowInHallTable(`istimrar`,breadcrumbs[i]);
 					}else{
 						periodsoutput = `${periodsoutput} ${period[0]} dam <br>`;
-						MakeRowInHallTable(`${period[0]} dam`,breadcrumbs[i]);
 					}
 
 				}else if(period[1]==3){//tuhure faasid
 					periodsoutput = `${periodsoutput} ${period[0]} tuhur e faasid <br>`;
-					MakeRowInHallTable(`${period[0]} tuhur e faasid`,breadcrumbs[i]);
 				}
 			}
 			gid("hall").innerHTML = `${periodsoutput}`
@@ -575,9 +556,6 @@
 	<p><span id="solution"></span></p>
 
 	<p><span id="hall"></span></p>
-
-	<table id="hall1">
-	</table>
 
 
 
