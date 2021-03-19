@@ -584,16 +584,23 @@
 
 		function getValuesOfPositions(positionsArray){
 			var stringOfSums = "";
-			//sort positions array in increasing order
-			positionsArray.sort(function(a, b){return a - b});
-			//get values for positions array
-			for(var i=0; i<positionsArray.length; i++){
-				var periodAtPosition = periods[positionsArray[i]];
-				var valueOfPosition = periodAtPosition[0];
-				stringOfSums= `${stringOfSums} + ${valueOfPosition}`;
-			}
-			if(stringOfSums.startsWith(" + ")){
-				stringOfSums=stringOfSums.substring(3);
+			if(positionsArray.length>1){
+				var sumOfString = 0;
+				//sort positions array in increasing order
+				positionsArray.sort(function(a, b){return a - b});
+				//get values for positions array
+				for(var i=0; i<positionsArray.length; i++){
+					var periodAtPosition = periods[positionsArray[i]];
+					var valueOfPosition = periodAtPosition[0];
+					sumOfString = sumOfString+valueOfPosition;
+
+					stringOfSums= `${stringOfSums} + ${valueOfPosition}`;
+				}
+				if(stringOfSums.startsWith(" + ")){
+					stringOfSums=stringOfSums.substring(3);
+				}
+				stringOfSums = `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(${stringOfSums} = ${sumOfString})`;
+
 			}
 
 			return(stringOfSums);
