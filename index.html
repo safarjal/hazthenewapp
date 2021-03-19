@@ -371,12 +371,15 @@
  		}
 
  		function dealWithBiggerThanTenDam(fixedPeriods){
+ 			//create a copy of fixed periods. don't mess with the original
+ 			var hazTuhrArray = copy(fixedPeriods);
+
 			var aadatHaiz = -1;
 			var aadatTuhr = -1;
 
-			for (var i = 1; i < fixedPeriods.length; i++) {
-				var currentPeriod = fixedPeriods[i];
-				var previousPeriod = fixedPeriods[i-1];
+			for (var i = 1; i < hazTuhrArray.length; i++) {
+				var currentPeriod = hazTuhrArray[i];
+				var previousPeriod = hazTuhrArray[i-1];
 				//get aadat
 				if (currentPeriod[0]<=10 && currentPeriod[1] == 0){//if we pass by a correct haz, put it in aadat
 					aadatHaiz = currentPeriod[0];
@@ -401,39 +404,87 @@
 
 
 						var result = solveDmBiggerThanTen(mp,gp,dm,hz);
-						//in istimrar, we gotta not look at istihaza after.
 
+						var qism = "";
+						if (result[4] == 1){
+							qism="A-1";
+						}else if (result[4] == 2){
+							qism="A-2";
+						}else if (result[4] == 3){
+							qism="A-3";							
+						}else if (result[4] == 5){
+							qism="B-2";
+						}else if (result[4] == 6){
+							qism="B-3";
+						}
+
+						var istihazaBefore = result[0];
+						var haz = result[1];
+						var istihazaAfter = result[2];
+
+						aadatHaiz = haz; //update aadat of haiz
 						if (result[3] == 1 && previousPeriod[1] == 1){//aadat of tuhr is changing
 							aadatTuhr == previousPeriod[0];//aadatTuhr was gp, only changes to mp if not faasid
 						}
+
+						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
+
+						var currentPeriodOfFP = fixedPeriods[i];
+						currentPeriodOfFP.push(answerToStringBiggerThanTen);
+						fixedPeriods[i] = currentPeriodOfFP;
+
+
+
+
+						function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz){
+							var outputString = "";
+							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}${dm}${tab}${hz}${tab}${qism}<br>`;
+							var outputStringHukmLine = `${tab}Hukm: Out of ${dm} days of dam, the first ${istihazaBefore} days are istihaza, the next ${hz} days are haiz, and the last ${istihazaAfter} days are istihaza.<br>`;
+							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
+							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine}`
+							return(outputString);
+
+						}
+
+
+
+						//in istimrar, we gotta not look at istihaza after.
+
+
+						//add istihaza before to the previous tuhr and mark tuhr as faasid
+						previousPeriod[0]=previousPeriod+result[0]; //result[0] is istihaza before
+						previousPeriod[1]=3; //tuhr e faasid
+						hazTuhrArray[i-1]=previousPeriod;
+
+						currentPeriod[0]= result[1]; //resize this to haz
+						hazTuhrArray[i] = currentPeriod;
+
+
 
 						if (result[2]>0 && currentPeriod[1] != -1){//there is an istihaza after it, and it ain't istimrar
 							//solving extremely long periods here
 							if (result[2]<aadatTuhr+3){
 								//add it's amount to tuhur in front of it
-								if (i < fixedPeriods.length-1){//there is a paki in front of it. 
-									var nextPeriod=fixedPeriods[i+1];
+								if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
+									var nextPeriod=hazTuhrArray[i+1];
 									nextPeriod[0] = nextPeriod[0] + result[2]; //add istihaza to it
 									nextPeriod[1] = 3;//mark it as tuhr faasid
-									fixedPeriods[i+1] = nextPeriod;
+									hazTuhrArray[i+1] = nextPeriod;
 								}else{//there is no paki in front of it
 									//create a new period
 									var nextPeriod = [result[2], 3];
-									fixedPeriods.push(nextPeriod);
+									hazTuhrArray.push(nextPeriod);
 								}
 							}else{//if it's greater than or equal aadat of tuhr +3, there is another period going to happen here
 								var nextPeriod = [result[2]-aadatTuhr, 0];
-								fixedPeriods.splice(i+1,0,nextPeriod);//create new dam
+								hazTuhrArray.splice(i+1,0,nextPeriod);//create new dam
 								nextPeriod = [aadatTuhr, 3];
-								fixedPeriods.splice(i+1,0,nextPeriod);//create istihaza
+								hazTuhrArray.splice(i+1,0,nextPeriod);//create istihaza
 
 							}
 						}
 
-
-						currentPeriod[0]= result[1]; //resize this to haz
-						fixedPeriods[i] = currentPeriod;
-						aadatHaiz = result[1]; //update aadat of haiz
 
 						//how come we aren;t talking about istihaza before???
 					}
@@ -454,7 +505,7 @@
 
 			}
  
- 			return(fixedPeriods); 			
+ 			return(hazTuhrArray); 			
  		}
 
 
@@ -483,7 +534,7 @@
 
 
 			//Step 3: Go through them all in order, fixing each period longer than 10, on the way.
-			fixedPeriods = dealWithBiggerThanTenDam(fixedPeriods);
+			var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
 
 
 			printPeriodsArray(fixedPeriods);
@@ -599,7 +650,8 @@
 				if(stringOfSums.startsWith(" + ")){
 					stringOfSums=stringOfSums.substring(3);
 				}
-				stringOfSums = `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(${stringOfSums} = ${sumOfString})`;
+				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+				stringOfSums = `${tab}(${stringOfSums} = ${sumOfString})`;
 
 			}
 
@@ -628,8 +680,12 @@
 				}else if(period[1]==3){//tuhure faasid
 					periodsoutput = `${periodsoutput} ${period[0]} tuhur e faasid <br>`;
 				}
-				var stringOfSums = getValuesOfPositions(period[2]);
+				var positionsArray = period[2];
+				var stringOfSums = getValuesOfPositions(positionsArray);
 				periodsoutput = `${periodsoutput} ${stringOfSums} <br>`;
+				if(period[1]==0 && period [0]>=10){
+					periodsoutput = `${periodsoutput}${period[3]} <br>`;
+				}
 
 			}
 			gid("hall").innerHTML = `${periodsoutput}`
