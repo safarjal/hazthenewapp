@@ -423,8 +423,8 @@
 						var istihazaAfter = result[2];
 
 						aadatHaiz = haz; //update aadat of haiz
-						if (result[3] == 1 && previousPeriod[1] == 1){//aadat of tuhr is changing
-							aadatTuhr = previousPeriod[0];//aadatTuhr was gp, only changes to mp if not faasid
+						if (result[3] == 1 && previousPeriod[1] == 1){//aadat of tuhr is changing, but only if mp is not faasid
+							aadatTuhr = mp;//aadatTuhr was gp, only changes to mp if not faasid
 						}
 
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
@@ -440,7 +440,29 @@
 							var outputString = "";
 							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}${dm}${tab}${hz}${tab}${qism}<br>`;
-							var outputStringHukmLine = `${tab}Hukm: Out of ${dm} days of dam, the first ${istihazaBefore} days are istihaza, the next ${hz} days are haiz, and the last ${istihazaAfter} days are istihaza.<br>`;
+							function dayDays(x){
+								if (x == 1){return(`1 day`);
+								}else{return(`${x} days`);
+								}
+							}
+							function dayDaysIsAre(x){
+								if (x == 1){return(`1 day is`);
+								}else{return(`${x} days are`);
+								}
+							}
+							var outputStringHukmLine = `${tab}Hukm: Out of ${dayDays(dm)} of dam, the first `;
+
+							if(istihazaBefore>0){//if there is istihaza before
+								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(istihazaBefore)} istihaza`;
+								if(istihazaAfter>0){//if there is istihaza after as well
+									outputStringHukmLine = `${outputStringHukmLine}, the next ${dayDaysIsAre(hz)} haiz, and the last ${dayDaysIsAre(istihazaAfter)} istihaza.<br>`;
+								}else{//if there is no istihaza after
+									outputStringHukmLine = `${outputStringHukmLine} and the next ${dayDaysIsAre(hz)} haiz.<br>`;
+								}
+							}else{//there is no istihaza before, there must be istihaza after
+								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(hz)} haiz, and the last ${dayDaysIsAre(istihazaAfter)} istihaza.<br>`;
+							}
+
 							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
 							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
 							return(outputString);
@@ -678,22 +700,22 @@
 			for (var i = 0; i < fixedPeriods.length; i++) {
 				var period = fixedPeriods[i];
 				if (period[1]==1){//tuhur
-					periodsoutput = `${periodsoutput} ${period[0]} tuhur <br>`;
+					periodsoutput = `${periodsoutput} <b>${period[0]} tuhur</b> <br>`;
 
 
 				}else if(period[1]==0){//dam
 					if (period[0]==0){//single spot
-						periodsoutput = `${periodsoutput} spot <br>`;
+						periodsoutput = `${periodsoutput} <b>spot</b> <br>`;
 
 
 					}else if(period[0]==-1){//istimrar
-						periodsoutput = `${periodsoutput} istimrar <br>`;
+						periodsoutput = `${periodsoutput} <b>istimrar</b> <br>`;
 					}else{
-						periodsoutput = `${periodsoutput} ${period[0]} dam <br>`;
+						periodsoutput = `${periodsoutput} <b>${period[0]} dam</b> <br>`;
 					}
 
 				}else if(period[1]==3){//tuhure faasid
-					periodsoutput = `${periodsoutput} ${period[0]} tuhur e faasid <br>`;
+					periodsoutput = `${periodsoutput} <b>${period[0]} tuhur e faasid</b> <br>`;
 				}
 				var positionsArray = period[2];
 				var stringOfSums = getValuesOfPositions(positionsArray);
