@@ -424,7 +424,7 @@
 
 						aadatHaiz = haz; //update aadat of haiz
 						if (result[3] == 1 && previousPeriod[1] == 1){//aadat of tuhr is changing
-							aadatTuhr == previousPeriod[0];//aadatTuhr was gp, only changes to mp if not faasid
+							aadatTuhr = previousPeriod[0];//aadatTuhr was gp, only changes to mp if not faasid
 						}
 
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
@@ -442,7 +442,7 @@
 							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}${dm}${tab}${hz}${tab}${qism}<br>`;
 							var outputStringHukmLine = `${tab}Hukm: Out of ${dm} days of dam, the first ${istihazaBefore} days are istihaza, the next ${hz} days are haiz, and the last ${istihazaAfter} days are istihaza.<br>`;
 							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
-							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine}`
+							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
 							return(outputString);
 
 						}
@@ -471,7 +471,7 @@
 									var nextPeriodFP = fixedPeriods[i+1];
 		
 									var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-									var outputString = `${tab}${nextPeriodFP[0]} + ${istihazaAfter} = ${nextPeriodFP[0]+istihazaAfter}<br>`;
+									var outputString = `${tab}${nextPeriodFP[0]} + ${istihazaAfter} istihaza = ${nextPeriodFP[0]+istihazaAfter} tuhr-e-faasid<br>`;
 									nextPeriodFP.push(outputString);
 
 
@@ -666,7 +666,7 @@
 					stringOfSums=stringOfSums.substring(3);
 				}
 				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-				stringOfSums = `${tab}(${stringOfSums} = ${sumOfString})`;
+				stringOfSums = `${tab}(${stringOfSums} = ${sumOfString}) <br>`;
 
 			}
 
@@ -697,16 +697,19 @@
 				}
 				var positionsArray = period[2];
 				var stringOfSums = getValuesOfPositions(positionsArray);
-				periodsoutput = `${periodsoutput} ${stringOfSums} <br>`;
+				if (stringOfSums!=""){
+					periodsoutput = `${periodsoutput} ${stringOfSums}`;
+				}
 				var checkNextTuhur;
-				if(period[1]==0 && period [0]>=10){
-					periodsoutput = `${periodsoutput}${period[3]} <br>`;
+				if(period[1]==0 && period [0]>10){
+					periodsoutput = `${periodsoutput}${period[3]}`;
 					checkNextTuhur = 1;
 				}
 				if(checkNextTuhur==1 && (period[1]==1 || period[1]==3)){
 					checkNextTuhur = 0;
-					periodsoutput = `${periodsoutput}${period[3]} <br>`;
-
+					if(period.length>=4){
+						periodsoutput = `${periodsoutput}${period[3]}`;
+					}
 				}
 
 			}
