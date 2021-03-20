@@ -427,6 +427,17 @@
 							aadatTuhr = mp;//aadatTuhr was gp, only changes to mp if not faasid
 						}
 
+						//experimental untested while loop to check a super long period
+
+						while(istihazaAfter>=aadatTuhr+3){
+							var remainingDam=istihazaAfter-aadatTuhr;
+							if(remainingDam>10){
+								istihazaAfter=remainingDam-aadatHaiz;
+							}else{
+								aadatHaiz=remainingDam;
+							}
+						}
+
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
 
 						var currentPeriodOfFP = fixedPeriods[i];
@@ -455,12 +466,12 @@
 							if(istihazaBefore>0){//if there is istihaza before
 								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(istihazaBefore)} istihaza`;
 								if(istihazaAfter>0){//if there is istihaza after as well
-									outputStringHukmLine = `${outputStringHukmLine}, the next ${dayDaysIsAre(hz)} haiz, and the last ${dayDaysIsAre(istihazaAfter)} istihaza.<br>`;
+									outputStringHukmLine = `${outputStringHukmLine}, the next ${dayDaysIsAre(haz)} haiz, and the last ${dayDaysIsAre(istihazaAfter)} istihaza.<br>`;
 								}else{//if there is no istihaza after
-									outputStringHukmLine = `${outputStringHukmLine} and the next ${dayDaysIsAre(hz)} haiz.<br>`;
+									outputStringHukmLine = `${outputStringHukmLine} and the next ${dayDaysIsAre(haz)} haiz.<br>`;
 								}
 							}else{//there is no istihaza before, there must be istihaza after
-								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(hz)} haiz, and the last ${dayDaysIsAre(istihazaAfter)} istihaza.<br>`;
+								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(haz)} haiz, and the last ${dayDaysIsAre(istihazaAfter)} istihaza.<br>`;
 							}
 
 							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
