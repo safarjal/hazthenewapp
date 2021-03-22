@@ -292,11 +292,11 @@
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
 
-				if (currentPeriod[1]==0 && nextPeriod[1]==-1){//if there is a dam before to istimrar, make it all istimrar.		
+				if (currentPeriod[1]==0 && nextPeriod[0]==-1){//if there is a dam before to istimrar, make it all istimrar.		
 
 
-					currentPeriod[1]=-1; //type is istimrar
-					currentPeriod[0]=0; //value is 0
+					currentPeriod[1]=0; //in istimrar, type is dam
+					currentPeriod[0]=-1; //and value is -1
 
 					//store position of next period in current period
 					currentPeriod[2] = currentPeriod[2].concat(nextPeriod[2]);
@@ -305,8 +305,8 @@
 					fixedPeriods.splice(i+1,1); // delete next period
 				}
 
-				if (currentPeriod[1]==nextPeriod[1]){//if type of current and next period is same
-					currentPeriod[0]= currentPeriod[0] + nextPeriod[0]; //add their values (for istimrar, 0+0 = 0)
+				if (currentPeriod[1]==nextPeriod[1] && nextPeriod[0] != -1){//if type of current and next period is same and it's not istimrar
+					currentPeriod[0]= currentPeriod[0] + nextPeriod[0]; //add their values
 					//store position of next period in current period
 					currentPeriod[2] = currentPeriod[2].concat(nextPeriod[2]);
 
@@ -353,7 +353,7 @@
 				var previousPeriod = fixedPeriods[i-1];
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
-				if (currentPeriod[0]<3 && currentPeriod[1]==0 ){//if value is less than 3 and type is dam
+				if (currentPeriod[0]<3 && currentPeriod[0] >= 0 && currentPeriod[1]==0 ){//if value is less than 3 (but not istimrar) and type is dam
 
 					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
 
@@ -381,15 +381,14 @@
 				var currentPeriod = hazTuhrArray[i];
 				var previousPeriod = hazTuhrArray[i-1];
 				//get aadat
-				if (currentPeriod[0]<=10 && currentPeriod[1] == 0){//if we pass by a correct haz, put it in aadat
+				if (currentPeriod[0]<=10 && currentPeriod[0] >= 3 && currentPeriod[1] == 0){//if we pass by a correct haz (that ain't istimrar), put it in aadat
 					aadatHaiz = currentPeriod[0];
 					if (previousPeriod[1] == 1){//aadat tuhr must be the last tuhr-e sahih followed by a haiz of less than 10. This is important because it differentiates between tuhr-e-sahih and faasid
 						aadatTuhr = previousPeriod[0];
 					}
 				}
 
-				if (currentPeriod[0]>10 && currentPeriod[1] == 0 || // if we pass by dam bigger than 10
-				currentPeriod[0] == 0 && currentPeriod[1] == -1){//or istimrar
+				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 1)
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
 						break;
 					}else{//we have both aadaat
@@ -443,8 +442,6 @@
 						var currentPeriodOfFP = fixedPeriods[i];
 						currentPeriodOfFP.push(answerToStringBiggerThanTen);
 						fixedPeriods[i] = currentPeriodOfFP;
-
-
 
 
 						function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz){
@@ -538,18 +535,69 @@
 					}
 				}
 
-				// //if the current period says istmrar on it.
-				// //Should we even make a seperate one for this?
-				// if (currentPeriod[0] == 0 && currentPeriod[1] == -1){
-				// 	if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
-				// 		break;
-				// 	}else{//we have both aadaat
-				// 		var mp = previousPeriod[0];
-				// 		var gp = aadatTuhr;
-				// 		var hz = aadatHaiz;
-				// 		var result = solveIstimrar(mp,gp,hz);
+				//if the current period says istmrar on it.
+				//Should we even make a seperate one for this?
+				if (currentPeriod[0] == -1 && currentPeriod[1] == 0){
+					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
+						break;
+					}else{//we have both aadaat
+						var mp = previousPeriod[0];
+						var gp = aadatTuhr;
+						var hz = aadatHaiz;
+						var result = solveIstimrar(mp,gp,hz);
 
-				// }
+						var qism = "";
+						if (result[3] == 1){
+							qism="A-1";
+						}else if (result[3] == 5){
+							qism="B-2";
+						}else if (result[3] == 6){
+							qism="B-3";
+						}
+
+						var istihazaBefore = result[0];
+						var haz = result[1];
+
+						aadatHaiz = haz; //update aadat of haiz
+						if (result[2] == 1 && previousPeriod[1] == 1){//aadat of tuhr is changing, but only if mp is not faasid
+							aadatTuhr = mp;//aadatTuhr was gp, only changes to mp if not faasid
+						}
+
+						var answerToStringBiggerThanTen = printAnswerToIstimrar(mp,gp,hz,qism, istihazaBefore, haz, aadatTuhr, aadatHaiz);
+
+						function printAnswerToIstimrar(mp,gp,hz,qism, istihazaBefore, haz, aadatTuhr, aadatHaiz){
+							var outputString = "";
+							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}Istimrar${tab}${hz}${tab}${qism}<br>`;
+							function dayDays(x){
+								if (x == 1){return(`1 day`);
+								}else{return(`${x} days`);
+								}
+							}
+							function dayDaysIsAre(x){
+								if (x == 1){return(`1 day is`);
+								}else{return(`${x} days are`);
+								}
+							}
+							var outputStringHukmLine = `${tab}Hukm: From the beginning of istimrar, the first `;
+
+							if(istihazaBefore>0){//if there is istihaza before
+								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(istihazaBefore)} istihaza, the next ${dayDaysIsAre(haz)} haiz, then until the end of dam, there is a cycle of ${dayDays(aadatTuhr)} of tuhur, and ${dayDays(aadatHaiz)} of haiz.<br>`;
+
+							}else{//there is no istihaza before
+								outputStringHukmLine = `${outputStringHukmLine}${dayDaysIsAre(haz)} haiz, then until the end of dam, there is a cycle of ${dayDays(aadatTuhr)} of tuhur, and ${dayDays(aadatHaiz)} of haiz.<br>`;
+							}
+
+							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
+							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
+							return(outputString);
+
+						}
+						var currentPeriodOfFP = fixedPeriods[i];
+						currentPeriodOfFP.push(answerToStringBiggerThanTen);
+						fixedPeriods[i] = currentPeriodOfFP;
+					}
+				}
 
 			}
  
@@ -588,39 +636,38 @@
 			printPeriodsArray(fixedPeriods);
 		}
 
-		// function solveIstimrar(mp, gp, hz){
-		// 	//dm here will be istimrar
-		// 	var answer = []; 
-		// 	var soorat = 0;
-		// 	var istihazaBefore = 0;
-		// 	var haiz = 0;
-		// 	var aadatTuhr = -1; // 0 for gp, 1 for mp
+		function solveIstimrar(mp, gp, hz){
+			//dm here will be istimrar
+			var answer = []; 
+			var soorat = 0;
+			var istihazaBefore = 0;
+			var haiz = 0;
+			var aadatTuhr = -1; // 0 for gp, 1 for mp
 
-		// 	if (mp <= gp) {    //Qism A - it will always be A-1
-		// 		soorat = 1;
-		// 		istihazaBefore = gp-mp;
-		// 		haiz = hz;
-		// 		aadatTuhr = 0;
-		// 	}else {	// mp>gp qism B
-		// 		if (hz - (mp - gp) >= 3) {							// soorat B-2
-		// 			soorat = 5;
-		// 			istihazaBefore = 0;
-		// 			haiz = hz-(mp-gp);
-		// 			aadatTuhr = 1;
-		// 		}else if (hz - (mp - gp) < 3) {						// soorat B-3
-		// 			soorat = 6;
-		// 			istihazaBefore = 0;
-		// 			haiz = hz;
-		// 			aadatTuhr = 1;
-		// 		}
-		// 	}
-		// 	answer.push(istihazaBefore); //istihaza before
-		// 	answer.push(haiz); //haiz
-		// 	answer.push(istihazaAfter) //istihaza after
-		// 	answer.push(aadatTuhr); //adat of tuhr, 0 if no change gp, 1 if change, mp
-		// 	answer.push(soorat);
-		// 	return(answer);
-		// }
+			if (mp <= gp) {    //Qism A - it will always be A-1
+				soorat = 1;
+				istihazaBefore = gp-mp;
+				haiz = hz;
+				aadatTuhr = 0;
+			}else {	// mp>gp qism B
+				if (hz - (mp - gp) >= 3) {							// soorat B-2
+					soorat = 5;
+					istihazaBefore = 0;
+					haiz = hz-(mp-gp);
+					aadatTuhr = 1;
+				}else if (hz - (mp - gp) < 3) {						// soorat B-3
+					soorat = 6;
+					istihazaBefore = 0;
+					haiz = hz;
+					aadatTuhr = 1;
+				}
+			}
+			answer.push(istihazaBefore); //istihaza before
+			answer.push(haiz); //haiz
+			answer.push(aadatTuhr); //adat of tuhr, 0 if no change gp, 1 if change, mp
+			answer.push(soorat);
+			return(answer);
+		}
 
 		function solveDmBiggerThanTen(mp, gp, dm, hz){
 			//This function will return an array called answer
@@ -734,7 +781,7 @@
 					periodsoutput = `${periodsoutput} ${stringOfSums}`;
 				}
 				var checkNextTuhur;
-				if(period[1]==0 && period [0]>10){
+				if(period[1]==0 && period [0]>10){ //for period bigger than 10
 					periodsoutput = `${periodsoutput}${period[3]}`;
 					checkNextTuhur = 1;
 				}
@@ -743,6 +790,9 @@
 					if(period.length>=4){
 						periodsoutput = `${periodsoutput}${period[3]}`;
 					}
+				}
+				if(period[1]==0 && period [0]==-1){ //for istimrar
+					periodsoutput = `${periodsoutput}${period[3]}`;
 				}
 
 			}
