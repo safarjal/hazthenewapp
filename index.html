@@ -183,7 +183,7 @@
 
 		function addTime(){
 			var oldTime = new Date(gid("strtTime1").value)/60000; //This gives the date in minutes
-			var additionalTime = Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*12*Number(gid("addTimeDays").value); //This value is also in minutes
+			var additionalTime = Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*24*Number(gid("addTimeDays").value); //This value is also in minutes
 			var newTime = (oldTime + additionalTime)*60000; //This value is in milisecond
 			
 			gid("addedTime").innerHTML = `${new Date(newTime)}`;
@@ -874,20 +874,20 @@
   	<hr/>
 	<p>Duration Calculator</p>
 	<table>
-		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-02-10T15:16" onchange="calculateDuration()"></td></tr>
-		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-05-10T15:16" onchange="calculateDuration()"></td></tr>
+		<tr><td>Start time:</td><td><input type="datetime-local" id="strtTime" value="2021-03-01T00:00" onchange="calculateDuration()"></td></tr>
+		<tr><td>End time:</td><td><input type="datetime-local" id="endTime" value="2021-03-20T00:00" onchange="calculateDuration()"></td></tr>
 	</table>
 	<p>The duration is <span id="duration"></span></p>
 	
 	<hr/>
 	<p>Add time to date</p>
-	<p>Start date and time: <input type="datetime-local" id="strtTime1" value="2021-02-10T15:16" onchange="addTime()"></p>
+	<p>Start date and time: <input type="datetime-local" id="strtTime1" value="2021-03-01T00:00" onchange="addTime()"></p>
 	<table>
 		<tr><td></td><td>Days</td><td>Hours</td><td>Minutes</td></tr>
 		<tr><td>Add time:</td>
 			<td><input type="text" id="addTimeDays" value="1" onchange="addTime()"></td>
-			<td><input type="text" id="addTimeHours" value="1" onchange="addTime()"></td>
-			<td><input type="text" id="addTimeMinutes" value="1" onchange="addTime()"></td>
+			<td><input type="text" id="addTimeHours" value="0" onchange="addTime()"></td>
+			<td><input type="text" id="addTimeMinutes" value="0" onchange="addTime()"></td>
 		</tr>
 	</table>
 	<p>The end time is <span id="addedTime"></span></p>
