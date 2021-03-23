@@ -61,6 +61,23 @@
 		//  X3=1 DM,HZ = (1,6)
 		//  X2=0 DM,HZ = (0,6)  ?
 		//  X1<0 DM,HZ = (-1,6) ?
+
+		function dayDays(x){
+			if (x == 1){
+				return(`1 day`);
+			}else{
+				return(`${x} days`);
+			}
+		}
+
+		function dayDaysIsAre(x){
+			if (x == 1){
+				return(`1 day is`);
+			}else{
+				return(`${x} days are`);
+			}
+		}
+
 		
 		function gid(id) { return document.getElementById(id) }
 		function start() {
@@ -112,6 +129,8 @@
 					var returnStatement = `${days} days, ${hours} hours, ${minutes} minutes`;
 					return returnStatement;
 				}
+
+
 				
 				gid('dam').innerHTML = daysHoursMinutes(dm);
 				if (mp <= gp) {    //Qism A
@@ -448,16 +467,6 @@
 							var outputString = "";
 							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}${dm}${tab}${hz}${tab}${qism}<br>`;
-							function dayDays(x){
-								if (x == 1){return(`1 day`);
-								}else{return(`${x} days`);
-								}
-							}
-							function dayDaysIsAre(x){
-								if (x == 1){return(`1 day is`);
-								}else{return(`${x} days are`);
-								}
-							}
 							var outputStringHukmLine = `${tab}Hukm: Out of ${dayDays(dm)} of dam, the first `;
 
 							if(istihazaBefore>0){//if there is istihaza before
@@ -569,16 +578,6 @@
 							var outputString = "";
 							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}Istimrar${tab}${hz}${tab}${qism}<br>`;
-							function dayDays(x){
-								if (x == 1){return(`1 day`);
-								}else{return(`${x} days`);
-								}
-							}
-							function dayDaysIsAre(x){
-								if (x == 1){return(`1 day is`);
-								}else{return(`${x} days are`);
-								}
-							}
 							var outputStringHukmLine = `${tab}Hukm: From the beginning of istimrar, the first `;
 
 							if(istihazaBefore>0){//if there is istihaza before
@@ -805,19 +804,19 @@
 				if (value == -1){//checking for istimrar
 					textToPrint=`${textToPrint} &rarr; istimrar`;
 				}else{
-					textToPrint=`${textToPrint} &rarr; ${value} days dam`;
+					textToPrint=`${textToPrint} &rarr; ${dayDays(value)} dam`;
 				}
 
 
 			}else if (t == 1){//tuhur
-				textToPrint=`${textToPrint} &rarr; ${value} days tuhur`;
+				textToPrint=`${textToPrint} &rarr; ${dayDays(value)} tuhur`;
 
 			}else{//spot
 				if (value == 0){//just a dhabba
 					textToPrint=`${textToPrint} &rarr; a spot`;
 
 				}else{
-					textToPrint=`${textToPrint} &rarr; ${value} days of spotting`;
+					textToPrint=`${textToPrint} &rarr; ${dayDays(value)} of spotting`;
 
 				}
 
