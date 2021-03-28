@@ -397,9 +397,11 @@
 			var aadatTuhr = -1;
 
 			for (var i = 1; i < hazTuhrArray.length; i++) {
+				//go through all the periods
+
 				var currentPeriod = hazTuhrArray[i];
 				var previousPeriod = hazTuhrArray[i-1];
-				//get aadat
+				//if we pass by a correct haz or tuhur, make it aadat
 				if (currentPeriod[0]<=10 && currentPeriod[0] >= 3 && currentPeriod[1] == 0){//if we pass by a correct haz (that ain't istimrar), put it in aadat
 					aadatHaiz = currentPeriod[0];
 					if (previousPeriod[1] == 1){//aadat tuhr must be the last tuhr-e sahih followed by a haiz of less than 10. This is important because it differentiates between tuhr-e-sahih and faasid
@@ -407,7 +409,7 @@
 					}
 				}
 
-				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 1)
+				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 10)
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
 						break;
 					}else{//we have both aadaat
@@ -445,16 +447,16 @@
 							aadatTuhr = mp;//aadatTuhr was gp, only changes to mp if not faasid
 						}
 
-						//experimental untested while loop to check a super long period
+						//experimental untested while loop to check a super long period. Said teacher, we will study this later
 
-						while(istihazaAfter>=aadatTuhr+3){
-							var remainingDam=istihazaAfter-aadatTuhr;
-							if(remainingDam>10){
-								istihazaAfter=remainingDam-aadatHaiz;
-							}else{
-								aadatHaiz=remainingDam;
-							}
-						}
+						// while(istihazaAfter>=aadatTuhr+3){
+						// 	var remainingDam=istihazaAfter-aadatTuhr;
+						// 	if(remainingDam>10){
+						// 		istihazaAfter=remainingDam-aadatHaiz;
+						// 	}else{
+						// 		aadatHaiz=remainingDam;
+						// 	}
+						// }
 
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
 
@@ -530,22 +532,25 @@
 									var nextPeriod = [istihazaAfter, 3];
 									hazTuhrArray.push(nextPeriod);
 								}
-							}else{//if it's greater than or equal aadat of tuhr +3, there is another period going to happen here
-								var nextPeriod = [istihazaAfter-aadatTuhr, 0];
-								hazTuhrArray.splice(i+1,0,nextPeriod);//create new dam
-								nextPeriod = [aadatTuhr, 3];
-								hazTuhrArray.splice(i+1,0,nextPeriod);//create istihaza
-
 							}
+							// else{//if it's greater than or equal aadat of tuhr +3, there is another period going to happen here. teacher said, will study this later
+							// 	var nextPeriod = [istihazaAfter-aadatTuhr, 0];
+							// 	hazTuhrArray.splice(i+1,0,nextPeriod);//create new dam
+							// 	nextPeriod = [aadatTuhr, 3];
+							// 	hazTuhrArray.splice(i+1,0,nextPeriod);//create istihaza
+
+							// }
 						}
 
 
 						//how come we aren;t talking about istihaza before???
+						//because it aint' relevant
 					}
 				}
 
 				//if the current period says istmrar on it.
 				//Should we even make a seperate one for this?
+				//yes
 				if (currentPeriod[0] == -1 && currentPeriod[1] == 0){
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
 						break;
@@ -553,6 +558,7 @@
 						var mp = previousPeriod[0];
 						var gp = aadatTuhr;
 						var hz = aadatHaiz;
+						//no dm, because that is istimrar
 						var result = solveIstimrar(mp,gp,hz);
 
 						var qism = "";
@@ -628,7 +634,7 @@
 			fixedPeriods = removeDamLessThanThree(fixedPeriods);
 
 
-			//Step 3: Go through them all in order, fixing each period longer than 10, on the way.
+			//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
 			var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
 
 
