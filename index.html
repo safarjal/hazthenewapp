@@ -481,7 +481,7 @@
 							istihazaAfter = roundToNearestTenth(istihazaAfter);
 							aadatTuhr = roundToNearestTenth(aadatTuhr);
 							aadatHaiz = roundToNearestTenth(aadatHaiz);
-							
+
 							var outputString = "";
 							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							var outputStringTitleLine = `${tab}${mp}${tab}${gp}${tab}${dm}${tab}${hz}${tab}${qism}<br>`;
@@ -870,6 +870,9 @@
 			//get values of Mashqi Sawal
 			var startTime = gid("strtTimeMS").value;
 			var endTime = gid("endTimeMS").value;
+			if (endTime<=startTime){
+				return;
+			}
 
 			var value = calculateDurationInDays(startTime,endTime);
 
