@@ -956,6 +956,7 @@
 
 			function switchValues(){
 				gid("strtTimeMS").value = gid("endTimeMS").value;
+				gid("strtTimeMS").disabled = true;
 			}
 
 		}
@@ -968,6 +969,8 @@
 			
 			periods.splice(0,periods.length);
 			gid("submitButtonMS").disabled=false;
+			gid("strtTimeMS").disabled = false;
+
 
 
 		}
@@ -1077,6 +1080,7 @@
 
 	<hr>
 	<p>Mashqi Sawal</p>
+	<p>Please enter information about periods, starting with the earliest period the saailah remembers. please also enter the tuhur amounts.</p>
 	<table>
 		<tr><td>Start:</td><td><input type="datetime-local" id="strtTimeMS" value="2021-02-10T00:00"></td></tr>
 		<tr><td>End:</td><td><input type="datetime-local" id="endTimeMS" value="2021-03-10T00:00"></td></tr>
