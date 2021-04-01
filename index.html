@@ -277,13 +277,19 @@
 			if (value == -1){//if it's istimrar
 				type = 0; //if it was set to something else, it should be autocorrected to dam. someone made a mistake
 			}
-			printValues(value, type); //Step 1: Write all the info with arrows
+			var textToPrint = printValues(value, type); //Step 1: Write all the info with arrows
+			gid("solution").innerHTML = `${textToPrint}`;
+
 			if (type == 2){ //convert spots to dam
 				type =0;
 			}
 			putValueInPeriodsArray(value,type);
-			fixPeriodsArray();
+			var fixedPeriods = fixPeriodsArray();
+			var periodsoutput = printPeriodsArray(fixedPeriods);
+			gid("hall").innerHTML = `${periodsoutput}`
+
 		}
+
 		var textToPrint="";
 		var periods = [];
 
@@ -637,8 +643,9 @@
 			//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
 			var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
 
+			return(fixedPeriods);
 
-			printPeriodsArray(fixedPeriods);
+
 		}
 
 		function solveIstimrar(mp, gp, hz){
@@ -801,7 +808,7 @@
 				}
 
 			}
-			gid("hall").innerHTML = `${periodsoutput}`
+			return(periodsoutput);
 
 		}
 
@@ -830,8 +837,8 @@
 			if (textToPrint.slice(0,8)== " &rarr; ") {//if it starts with an arrow, remove it
 				textToPrint=textToPrint.slice(8);
 			}
+			return(textToPrint);
 
-			gid("solution").innerHTML = `${textToPrint}`;
 		}
 
 		function resetDimaAthaar(){
@@ -841,6 +848,127 @@
 			periods.splice(0,periods.length);
 			gid("numberofdays").value=`0`;
 			gid("submitButton").disabled=false;
+
+		}
+		var dates = "";
+
+		function submitMS(){
+			//get values of Mashqi Sawal
+			var startTime = gid("strtTimeMS").value;
+			var endTime = gid("endTimeMS").value;
+
+			var value = calculateDurationInDays(startTime,endTime);
+
+			var type = 5;//5 is not a type if it turns up 5, there's an error
+
+
+			function calculateDurationInDays(st, et){
+				var diff = Math.abs((new Date(st)- new Date(et))/60000); //This gives the diff in minutes
+				var returnDays = diff/(60*24);
+				// var minutes = diff % 60;
+				// diff = (diff - minutes)/60; //now diff is in hours
+				// var hours = diff % 24;
+				// var days = (diff - hours)/24;
+				// var returnString = `${days} days, ${hours} hours, ${minutes} minutes`;
+				return(returnDays);
+			}
+
+			var damTuhurSpot = document.getElementsByName("damtuhurspotMS");
+			for (var i = 0, length = damTuhurSpot.length; i < length; i++) {
+ 				 if (damTuhurSpot[i].checked) {
+    				// do whatever you want with the checked radio
+    				type = damTuhurSpot[i].value;
+
+  					// only one radio can be logically checked, don't check the rest
+    				break;
+  				}
+			}
+
+			printDates(startTime, endTime, value, type);
+
+			function printDates(startTime, endTime, value, type){
+				startTime=formatDates(startTime);
+				endTime=formatDates(endTime);
+
+				function formatDates(date){
+					var day = date.slice(8,10);
+					var month = date.slice(5,7);
+					if (month == "01"){
+						month = "January";
+					}else if (month == "02"){
+						month = "February";
+					}else if (month == "03"){
+						month = "March";
+					}else if (month == "04"){
+						month = "April";
+					}else if (month == "05"){
+						month = "May";
+					}else if (month == "06"){
+						month = "June";
+					}else if (month == "07"){
+						month = "July";
+					}else if (month == "08"){
+						month = "August";
+					}else if (month == "09"){
+						month = "September";
+					}else if (month == "10"){
+						month = "October";
+					}else if (month == "11"){
+						month = "November";
+					}else if (month == "12"){
+						month = "December";
+					}
+
+					var year = date.slice(0,4);
+
+					return(`${day} ${month}, ${year}`);
+				}
+
+
+				var typeInString = "";
+				if (type == 0){
+					typeInString = "dam";
+				}else if (type == 1){
+					typeInString = "tuhur";
+				}else if (type == 2){
+					typeInString = "spotting";
+				}
+				dates = `${dates}<br>${startTime} - ${endTime} = ${value} days of ${typeInString}`;
+				if (dates.slice(0,4)== "<br>") {//if it starts with a linebreak, remove it
+					dates=dates.slice(4);
+				}
+
+				gid("datesMS").innerHTML = `${dates}`;
+			}
+
+
+			var textToPrint = printValues(value, type); //Step 1: Write all the info with arrows
+			gid("solutionMS").innerHTML = `${textToPrint}`;
+
+			if (type == 2){ //convert spots to dam
+				type =0;
+			}
+			putValueInPeriodsArray(value,type);
+			var fixedPeriods = fixPeriodsArray();
+			var periodsoutput = printPeriodsArray(fixedPeriods);
+			gid("hallMS").innerHTML = `${periodsoutput}`
+			switchValues();//switvh value of start time and endtime
+
+			function switchValues(){
+				gid("strtTimeMS").value = gid("endTimeMS").value;
+			}
+
+		}
+
+		function resetMS(){
+			textToPrint = "";
+			gid("solutionMS").innerHTML = `${textToPrint}`;
+			gid("hallMS").innerHTML = ``;
+			gid("datesMS").innerHTML = ``;
+			
+			periods.splice(0,periods.length);
+			gid("submitButtonMS").disabled=false;
+
 
 		}
 
@@ -946,6 +1074,32 @@
 	<table id="output">
 		<tr><td>Start Time</td><td>End Time</td></tr>
 	</table>
+
+	<hr>
+	<p>Mashqi Sawal</p>
+	<table>
+		<tr><td>Start:</td><td><input type="datetime-local" id="strtTimeMS" value="2021-02-10T00:00"></td></tr>
+		<tr><td>End:</td><td><input type="datetime-local" id="endTimeMS" value="2021-03-10T00:00"></td></tr>
+		<tr><td><input type="radio" id="damRadioMS" name="damtuhurspotMS" value="0">Dam</td></tr>
+		<tr><td><input type="radio" id="tuhurRadioMS" name="damtuhurspotMS" value="1">Tuhur</td></tr>
+		<tr><td><input type="radio" id="spotRadioMS" name="damtuhurspotMS" value="2">Spot</td></tr>
+		<tr><td><input type="text" id="textBoxMS" value="0"></td><td><label for="numberofdays">Aadat</label></td>
+	</table>
+	<input type="button" value="Submit" id="submitButtonMS" onclick="submitMS()">
+	<input type="button" value="Reset" onclick="resetMS()"><br>
+
+	<p><span id="datesMS"></span></p>
+
+	<p><span id="solutionMS"></span></p>
+
+	<p><span id="hallMS"></span></p>
+
+
+
+
+
+  	<hr>
+
 	
 	
 	<script>
