@@ -472,15 +472,15 @@
 
 
 						function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz){
-							mp = roundToNearestTen(mp);
-							gp = roundToNearestTen(gp);
-							dm = roundToNearestTen(dm);
-							hz = roundToNearestTen(hz);
-							istihazaBefore = roundToNearestTen(istihazaBefore);
-							haz = roundToNearestTen(haz);
-							istihazaAfter = roundToNearestTen(istihazaAfter);
-							aadatTuhr = roundToNearestTen(aadatTuhr);
-							aadatHaiz = roundToNearestTen(aadatHaiz);
+							mp = roundToNearestTenth(mp);
+							gp = roundToNearestTenth(gp);
+							dm = roundToNearestTenth(dm);
+							hz = roundToNearestTenth(hz);
+							istihazaBefore = roundToNearestTenth(istihazaBefore);
+							haz = roundToNearestTenth(haz);
+							istihazaAfter = roundToNearestTenth(istihazaAfter);
+							aadatTuhr = roundToNearestTenth(aadatTuhr);
+							aadatHaiz = roundToNearestTenth(aadatHaiz);
 							
 							var outputString = "";
 							var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -750,7 +750,7 @@
 			return(answer);
 		}
 
-		function roundToNearestTen(value){
+		function roundToNearestTenth(value){
 			return(Math.round(value * 10) / 10);
 		}
 
@@ -766,13 +766,13 @@
 					var valueOfPosition = periodAtPosition[0];
 					sumOfString = sumOfString+valueOfPosition;
 
-					stringOfSums= `${stringOfSums} + ${roundToNearestTen(valueOfPosition)}`;
+					stringOfSums= `${stringOfSums} + ${roundToNearestTenth(valueOfPosition)}`;
 				}
 				if(stringOfSums.startsWith(" + ")){
 					stringOfSums=stringOfSums.substring(3);
 				}
 				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-				stringOfSums = `${tab}(${stringOfSums} = ${roundToNearestTen(sumOfString)} <br>`;
+				stringOfSums = `${tab}(${stringOfSums} = ${roundToNearestTenth(sumOfString)} <br>`;
 
 			}
 
@@ -784,7 +784,7 @@
 			for (var i = 0; i < fixedPeriods.length; i++) {
 				var period = fixedPeriods[i];
 				if (period[1]==1){//tuhur
-					periodsoutput = `${periodsoutput} <b>${roundToNearestTen(period[0])} tuhur</b> <br>`;
+					periodsoutput = `${periodsoutput} <b>${roundToNearestTenth(period[0])} tuhur</b> <br>`;
 
 
 				}else if(period[1]==0){//dam
@@ -795,11 +795,11 @@
 					}else if(period[0]==-1){//istimrar
 						periodsoutput = `${periodsoutput} <b>istimrar</b> <br>`;
 					}else{
-						periodsoutput = `${periodsoutput} <b>${roundToNearestTen(period[0])} dam</b> <br>`;
+						periodsoutput = `${periodsoutput} <b>${roundToNearestTenth(period[0])} dam</b> <br>`;
 					}
 
 				}else if(period[1]==3){//tuhure faasid
-					periodsoutput = `${periodsoutput} <b>${roundToNearestTen(period[0])} tuhur e faasid</b> <br>`;
+					periodsoutput = `${periodsoutput} <b>${roundToNearestTenth(period[0])} tuhur e faasid</b> <br>`;
 				}
 				var positionsArray = period[2];
 				var stringOfSums = getValuesOfPositions(positionsArray);
@@ -831,19 +831,19 @@
 				if (value == -1){//checking for istimrar
 					textToPrint=`${textToPrint} &rarr; istimrar`;
 				}else{
-					textToPrint=`${textToPrint} &rarr; ${dayDays(roundToNearestTen(value))} dam`;
+					textToPrint=`${textToPrint} &rarr; ${dayDays(roundToNearestTenth(value))} dam`;
 				}
 
 
 			}else if (t == 1){//tuhur
-				textToPrint=`${textToPrint} &rarr; ${dayDays(roundToNearestTen(value))} tuhur`;
+				textToPrint=`${textToPrint} &rarr; ${dayDays(roundToNearestTenth(value))} tuhur`;
 
 			}else{//spot
 				if (value == 0){//just a dhabba
 					textToPrint=`${textToPrint} &rarr; a spot`;
 
 				}else{
-					textToPrint=`${textToPrint} &rarr; ${dayDays(roundToNearestTen(value))} of spotting`;
+					textToPrint=`${textToPrint} &rarr; ${dayDays(roundToNearestTenth(value))} of spotting`;
 
 				}
 
@@ -947,7 +947,7 @@
 				}else if (type == 2){
 					typeInString = "spotting";
 				}
-				dates = `${dates}<br>${startTime} - ${endTime} = ${roundToNearestTen(value)} days of ${typeInString}`;
+				dates = `${dates}<br>${startTime} - ${endTime} = ${roundToNearestTenth(value)} days of ${typeInString}`;
 				if (dates.slice(0,4)== "<br>") {//if it starts with a linebreak, remove it
 					dates=dates.slice(4);
 				}
