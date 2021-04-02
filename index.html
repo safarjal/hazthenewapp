@@ -210,45 +210,6 @@
 
 		var dima = [];
 
-		function inputNewDam(){
-			var strtTimeOfDm = new Date(gid("strtTimeOfDm").value);
-			var endTimeOfDm = new Date (gid("endTimeOfDm").value);
-			var dam = [strtTimeOfDm, endTimeOfDm];
-			dima.push(dam); //This adds the dam to the array of dima
-			printDam(dam[0],dam[1]);
-
-			//These lines print this submited entry into the table
-		}
-
-		function printDam(){
-			var row = document.createElement('tr')
-			var td1 = document.createElement('td')
-			td1.appendChild(document.createTextNode(`${arguments[0]}`));
-			row.appendChild(td1)
-			var td2 = document.createElement('td')
-			td2.appendChild(document.createTextNode(`${arguments[1]}`));
-			row.appendChild(td2)
-			gid("output").appendChild(row);
-
-			makeDurationsArrayOfDmAndPaki();
-		}
-
-		function makeDurationsArrayOfDmAndPaki(){
-			var durationsarray = [];
-			for (var i = 0; i<dima.length; i++){
-				var dam = dima[i];
-				var duration = 0;
-				if (i>0){
-					var previousdam = dima[i-1];
-					duration = dam[0]-previousdam[1];
-					durationsarray.push([duration, 1]);//1 means tuhur
-				}
-				duration = dam[1] - dam[0];
-				durationsarray.push([duration, 2]); //2 means dam
-
-			}
-		}
-
 		function submitDimaAthaar(){
 			getValues();
 		}
@@ -286,7 +247,7 @@
 			putValueInPeriodsArray(value,type);
 			var fixedPeriods = fixPeriodsArray();
 			var periodsoutput = printPeriodsArray(fixedPeriods);
-			gid("hall").innerHTML = `${periodsoutput}`
+			gid("hall").innerHTML = `${periodsoutput}`;
 
 		}
 
@@ -402,6 +363,13 @@
 			var aadatHaiz = -1;
 			var aadatTuhr = -1;
 
+			if(givenAadatOfTuhr > -1){
+				aadatTuhr = givenAadatOfTuhr;
+			}
+			if(givenAadatOfHaiz > -1){
+				aadatHaiz = givenAadatOfHaiz;
+			}
+
 			for (var i = 1; i < hazTuhrArray.length; i++) {
 				//go through all the periods
 
@@ -417,10 +385,6 @@
 
 				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 10)
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
-						var currentPeriodOfFP = fixedPeriods[i];
-						currentPeriodOfFP.push("As we don't have the aadat for haiz and tuhur, we can't solve this.");
-						fixedPeriods[i] = currentPeriodOfFP;
-
 						break;
 					}else{//we have both aadaat
 						var mp = previousPeriod[0];
@@ -990,11 +954,75 @@
 			gid("solutionMS").innerHTML = `${textToPrint}`;
 			gid("hallMS").innerHTML = ``;
 			gid("datesMS").innerHTML = ``;
+			gid("aadatTextMS").innerHTML = ``;
 			
 			periods.splice(0,periods.length);
 			gid("submitButtonMS").disabled=false;
 			gid("strtTimeMS").disabled = false;
+			givenAadatOfHaiz = -1;
+			givenAadatOfTuhr = -1;
 
+
+
+		}
+
+		var givenAadatOfHaiz=-1;
+		var givenAadatOfTuhr=-1;
+
+		function onChangeAadat(){
+			var aadatText = gid("aadatMS").value;
+			var aadatHaiz = -1;
+			var aadatTuhur = -1;
+			while (aadatText.startsWith(" ")){//slice trailing spaces before
+				aadatText.slice(0,1);
+			}
+
+			while (aadatText.endsWith(" ")){
+				aadatText.slice(aadatText.length,aadatText.length+1);	//slice trailing spaces after
+			}
+
+			if (aadatText.includes("/") ){
+				var aadatOne = aadatText.slice(0,aadatText.indexOf("/"));
+				var aadatTwo = aadatText.slice(aadatText.indexOf("/")+1, aadatText.length+1);
+				if(aadatOne<=10 && aadatOne >= 3 && aadatTwo>=15){
+					aadatHaiz = aadatOne;
+					aadatTuhur = aadatTwo;
+				}else if(aadatTwo<=10 && aadatTwo >=3 && aadatOne>=15){
+					aadatHaiz = aadatTwo;
+					aadatTuhur = aadatOne;
+				}
+			}else if (aadatText.includes("-") ){
+				var aadatOne = aadatText.slice(0,aadatText.indexOf("-"));
+				var aadatTwo = aadatText.slice(aadatText.indexOf("-")+1, aadatText.length+1);
+				if(aadatOne<=10 && aadatOne >= 3 && aadatTwo>=15){
+					aadatHaiz = aadatOne;
+					aadatTuhur = aadatTwo;
+				}else if(aadatTwo<=10 && aadatTwo >=3 && aadatOne>=15){
+					aadatHaiz = aadatTwo;
+					aadatTuhur = aadatOne;
+				}
+
+			}
+			if (aadatHaiz != -1 && aadatTuhur != -1) {
+				gid("aadatTextMS").innerHTML = `Aadat: ${aadatHaiz}/${aadatTuhur}`;
+				givenAadatOfTuhr = aadatTuhur;
+				givenAadatOfHaiz = aadatHaiz;
+				//trigger calculate
+				var fixedPeriods = fixPeriodsArray();
+				var periodsoutput = printPeriodsArray(fixedPeriods);
+				gid("hallMS").innerHTML = `${periodsoutput}`;
+
+			}else{
+				gid("aadatTextMS").innerHTML = `Aadat is incorrect`;
+				givenAadatOfTuhr = -1;
+				givenAadatOfHaiz = -1;
+				//trigger calculate
+				var fixedPeriods = fixPeriodsArray();
+				var periodsoutput = printPeriodsArray(fixedPeriods);
+				gid("hallMS").innerHTML = `${periodsoutput}`;
+
+
+			}
 
 
 		}
@@ -1097,12 +1125,15 @@
 		<tr><td><input type="radio" id="damRadioMS" name="damtuhurspotMS" value="0">Dam</td></tr>
 		<tr><td><input type="radio" id="tuhurRadioMS" name="damtuhurspotMS" value="1">Tuhur</td></tr>
 		<tr><td><input type="radio" id="spotRadioMS" name="damtuhurspotMS" value="2">Spot</td></tr>
-		<tr><td><input type="text" id="textBoxMS" value="0"></td><td><label for="numberofdays">Aadat</label></td>
+		<tr><td><p>Please enter both aadaat separated by a / (Example: 3/15)</p></td></tr>
+		<tr><td><input type="text" id="aadatMS" onchange="onChangeAadat()" value=""></td><td><label for="numberofdays">Aadat</label></td>
 	</table>
 	<input type="button" value="Submit" id="submitButtonMS" onclick="submitMS()">
 	<input type="button" value="Reset" onclick="resetMS()"><br>
 
 	<p><span id="datesMS"></span></p>
+
+	<p><span id="aadatTextMS"></span></p>
 
 	<p><span id="solutionMS"></span></p>
 
