@@ -417,6 +417,10 @@
 
 				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 10)
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
+						var currentPeriodOfFP = fixedPeriods[i];
+						currentPeriodOfFP.push("As we don't have the aadat for haiz and tuhur, we can't solve this.");
+						fixedPeriods[i] = currentPeriodOfFP;
+
 						break;
 					}else{//we have both aadaat
 						var mp = previousPeriod[0];
@@ -808,8 +812,10 @@
 				}
 				var checkNextTuhur;
 				if(period[1]==0 && period [0]>10){ //for period bigger than 10
-					periodsoutput = `${periodsoutput}${period[3]}`;
-					checkNextTuhur = 1;
+					if(period.length>3){
+						periodsoutput = `${periodsoutput}${period[3]}`;
+						checkNextTuhur = 1;
+					}
 				}
 				if(checkNextTuhur==1 && (period[1]==1 || period[1]==3)){
 					checkNextTuhur = 0;
