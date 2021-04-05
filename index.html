@@ -525,7 +525,7 @@
 									date = date.slice(0,24);//all GMT stuff removed
 									var dayOfWeek = date.slice(0,3);
 									var month = date.slice(4,7);
-									var day = date.slice(8,10);
+									var day = Number(date.slice(8,10));
 									var year = date.slice(11,15);
 									var hours = Number(date.slice(16,18));
 									var ampm = "am";
@@ -538,24 +538,21 @@
 										hours = 12;
 									}
 
+									if (hours == 12 && minutes == "00" && ampm == "am"){
+										date = `${month} ${day}, ${year}`;
 
-									date = `${hours}:${minutes} ${ampm} on ${month} ${day}, ${year}`
+									}else{
+										date = `${hours}:${minutes} ${ampm} on ${month} ${day}, ${year}`;
+									}
+
+
 									return (date);
 
 								}
 
-
-								// startTimeOfIstihazaBefore = formatDates(startTimeOfIstihazaBefore);
-								// endTimeOfIstihazaBefore = formatDates(endTimeOfIstihazaBefore);
-								// startTimeOfHaz = formatDates(startTimeOfHaz);
-								// endTimeOfHaz = formatDates(endTimeOfHaz);
-								// startTimeOfIstihazaAfter = formatDates(startTimeOfIstihazaAfter);
-								// endTimeOfIstihazaAfter = formatDates(endTimeOfIstihazaAfter);
-
-
 								var istihazaBeforeLine = `${tab}From ${startTimeOfIstihazaBefore} to ${endTimeOfIstihazaBefore} is istihaza, yaqeeni paki. If you didn't pray namaz or keep roza in these dates, due to the assumption of haiz, you must repeat these namaz and rozas.<br>`;
 
-								var hazLine = `${tab}From ${startTimeOfHaz} to ${endTimeOfHaz} are your haiz dates. Any prayers or fasts in this time are kaladam.<br>`;
+								var hazLine = `${tab}From ${startTimeOfHaz} to ${endTimeOfHaz} are your haiz dates. Any prayers or fasts in this time are null and void.<br>`;
 
 								var istihazaAfterLine = `${tab}From ${startTimeOfIstihazaAfter} to ${endTimeOfIstihazaAfter} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
 
@@ -1083,7 +1080,7 @@
 			gid("hallMS").innerHTML = ``;
 			gid("datesMS").innerHTML = ``;
 			gid("aadatTextMS").innerHTML = ``;
-			
+			gid("aadatMS").value = "";
 			gid("strtTimeMS").disabled = false;
 
 
