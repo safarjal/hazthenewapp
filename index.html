@@ -201,11 +201,20 @@
 		}
 
 		function addTime(){
-			var oldTime = new Date(gid("strtTime1").value)/60000; //This gives the date in minutes
-			var additionalTime = Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*24*Number(gid("addTimeDays").value); //This value is also in minutes
+
+			var date = gid("strtTime1").value;
+			var timeInDays = (Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*24*Number(gid("addTimeDays").value))/1440;
+			gid("addedTime").innerHTML = addTimeToDate(date,timeInDays);
+
+		}
+
+		function addTimeToDate(date, timeInDays){
+			var oldTime = new Date(date)/60000; //This gives the date in minutes
+			var additionalTime = timeInDays*1440; //This value is also in minutes
+
 			var newTime = (oldTime + additionalTime)*60000; //This value is in milisecond
-			
-			gid("addedTime").innerHTML = `${new Date(newTime)}`;
+			newTime = `${new Date(newTime)}`;
+			return(newTime);
 		}
 
 		var dima = [];
@@ -375,6 +384,13 @@
 
 				var currentPeriod = hazTuhrArray[i];
 				var previousPeriod = hazTuhrArray[i-1];
+				var startTimeOfCurrentPeriod;
+
+				//if there is a starting date
+				if(startDateForQuestion != -1){
+					startTimeOfCurrentPeriod= addTimeToDate(startDateForQuestion, previousPeriod[0]);
+				}
+
 				//if we pass by a correct haz or tuhur, make it aadat
 				if (currentPeriod[0]<=10 && currentPeriod[0] >= 3 && currentPeriod[1] == 0){//if we pass by a correct haz (that ain't istimrar), put it in aadat
 					aadatHaiz = currentPeriod[0];
@@ -434,6 +450,18 @@
 
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
 
+						// function addTimeMS(startDate, addedAmountInDays){
+						// 	var oldTime = new Date(gid("strtTime1").value)/60000; //This gives the date in minutes
+						// 	var additionalTime = Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*24*Number(gid("addTimeDays").value); //This value is also in minutes
+						// 	var newTime = (oldTime + additionalTime)*60000; //This value is in milisecond
+			
+						// 	gid("addedTime").innerHTML = `${new Date(newTime)}`;
+						// 	var answer = startDate +
+
+						// 	return(answer);
+						// }
+
+
 						var currentPeriodOfFP = fixedPeriods[i];
 						currentPeriodOfFP.push(answerToStringBiggerThanTen);
 						fixedPeriods[i] = currentPeriodOfFP;
@@ -468,7 +496,52 @@
 
 							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
 							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
+
+							//write hukm in dates
+							if (startDateForQuestion != -1){//there is a date in this question
+								var startTimeOfIstihazaBefore = startTimeOfCurrentPeriod;
+								var endTimeOfIstihazaBefore = addTimeToDate(startTimeOfCurrentPeriod, istihazaBefore);
+								var startTimeOfHaz = endTimeOfIstihazaBefore;
+								var endTimeOfHaz = addTimeToDate(startTimeOfHaz, haz);
+								var startTimeOfIstihazaAfter = endTimeOfHaz;
+								var endTimeOfIstihazaAfter = addTimeToDate(startTimeOfIstihazaAfter, istihazaAfter);
+
+								// startTimeOfIstihazaBefore = formatDates(startTimeOfIstihazaBefore);
+								// endTimeOfIstihazaBefore = formatDates(endTimeOfIstihazaBefore);
+								// startTimeOfHaz = formatDates(startTimeOfHaz);
+								// endTimeOfHaz = formatDates(endTimeOfHaz);
+								// startTimeOfIstihazaAfter = formatDates(startTimeOfIstihazaAfter);
+								// endTimeOfIstihazaAfter = formatDates(endTimeOfIstihazaAfter);
+
+
+								var istihazaBeforeLine = `${tab}From ${startTimeOfIstihazaBefore} to ${endTimeOfIstihazaBefore} is istihaza, yaqeeni paki. If you didn't pray namaz or keep roza in these dates, due to the assumption of haiz, you must repeat these namaz and rozas.<br>`;
+
+								var hazLine = `${tab}From ${startTimeOfHaz} to ${endTimeOfHaz} are your haiz dates. Any prayers or fasts in this time are kaladam.<br>`;
+
+								var istihazaAfterLine = `${tab}From ${startTimeOfIstihazaAfter} to ${endTimeOfIstihazaAfter} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
+
+								var miscLines = `${tab}Please write down the date and time for the start or end of any bleeding or spotting you experience.<br>`;
+
+
+
+								var outputStringInDates = ``;
+							
+								if(istihazaBefore>0){//if there is istihaza before
+									outputStringInDates = `${istihazaBeforeLine}${hazLine}`;
+									if(istihazaAfter>0){//if there is istihaza after as well
+										outputStringInDates = `${outputStringHukmLineInDates}${istihazaAfterLine}`;
+									}
+								}else{//there is no istihaza before, there must be istihaza after
+									outputStringInDates = `${hazLine}${istihazaAfterLine}`;
+								}
+
+								outputStringInDates = `${outputStringInDates}${miscLines}`;
+								outputString = `${outputString}${outputStringInDates}`;
+							}
+
 							return(outputString);
+
+							
 
 						}
 
@@ -827,19 +900,27 @@
 
 		function resetDimaAthaar(){
 			textToPrint = "";
+			givenAadatOfHaiz = -1;
+			givenAadatOfTuhr = -1;
+			periods.splice(0,periods.length);
 			gid("solution").innerHTML = `${textToPrint}`;
 			gid("hall").innerHTML = ``;
-			periods.splice(0,periods.length);
 			gid("numberofdays").value=`0`;
 			gid("submitButton").disabled=false;
 
 		}
 		var dates = "";
+		var startDateForQuestion = -1;
 
 		function submitMS(){
 			//get values of Mashqi Sawal
 			var startTime = gid("strtTimeMS").value;
 			var endTime = gid("endTimeMS").value;
+
+			if (startDateForQuestion == -1){//store the first value for this question.
+				startDateForQuestion = startTime;
+			}
+
 			if (endTime<=startTime){
 				return;
 			}
@@ -951,16 +1032,16 @@
 		function resetMS(){
 			textToPrint = "";
 			dates = "";
+			givenAadatOfHaiz = -1;
+			givenAadatOfTuhr = -1;
+			startDateForQuestion = -1;
+			periods.splice(0,periods.length);
 			gid("solutionMS").innerHTML = `${textToPrint}`;
 			gid("hallMS").innerHTML = ``;
 			gid("datesMS").innerHTML = ``;
 			gid("aadatTextMS").innerHTML = ``;
 			
-			periods.splice(0,periods.length);
-			gid("submitButtonMS").disabled=false;
 			gid("strtTimeMS").disabled = false;
-			givenAadatOfHaiz = -1;
-			givenAadatOfTuhr = -1;
 
 
 
@@ -1125,11 +1206,13 @@
 		<tr><td><input type="radio" id="damRadioMS" name="damtuhurspotMS" value="0">Dam</td></tr>
 		<tr><td><input type="radio" id="tuhurRadioMS" name="damtuhurspotMS" value="1">Tuhur</td></tr>
 		<tr><td><input type="radio" id="spotRadioMS" name="damtuhurspotMS" value="2">Spot</td></tr>
-		<tr><td><p>Please enter both aadaat separated by a / (Example: 3/15)</p></td></tr>
-		<tr><td><input type="text" id="aadatMS" onchange="onChangeAadat()" value=""></td><td><label for="numberofdays">Aadat</label></td>
 	</table>
 	<input type="button" value="Submit" id="submitButtonMS" onclick="submitMS()">
 	<input type="button" value="Reset" onclick="resetMS()"><br>
+
+	<p>Please enter both aadaat separated by a / (Example: 3/15)</p>
+	<p><input type="text" id="aadatMS" onchange="onChangeAadat()" value=""><label for="numberofdays">Aadat</label></p>
+
 
 	<p><span id="datesMS"></span></p>
 
