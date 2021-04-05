@@ -921,9 +921,6 @@
 				startDateForQuestion = startTime;
 			}
 
-			if (endTime<=startTime){
-				return;
-			}
 
 			var value = calculateDurationInDays(startTime,endTime);
 
@@ -950,6 +947,13 @@
   					// only one radio can be logically checked, don't check the rest
     				break;
   				}
+			}
+
+
+			if (endTime<=startTime && type != 2){
+				return;
+			}else if (endTime<=startTime && type == 2){
+				value = 0;
 			}
 
 			printDates(startTime, endTime, value, type);
