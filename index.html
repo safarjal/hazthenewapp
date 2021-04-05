@@ -379,16 +379,21 @@
 				aadatHaiz = givenAadatOfHaiz;
 			}
 
+			var startTimeOfCurrentPeriod = 0;
+
 			for (var i = 1; i < hazTuhrArray.length; i++) {
 				//go through all the periods
 
 				var currentPeriod = hazTuhrArray[i];
 				var previousPeriod = hazTuhrArray[i-1];
-				var startTimeOfCurrentPeriod;
 
 				//if there is a starting date
 				if(startDateForQuestion != -1){
-					startTimeOfCurrentPeriod= addTimeToDate(startDateForQuestion, previousPeriod[0]);
+					if (startTimeOfCurrentPeriod == 0){
+						startTimeOfCurrentPeriod = startDateForQuestion;
+					}
+
+					startTimeOfCurrentPeriod= addTimeToDate(startTimeOfCurrentPeriod, previousPeriod[0]);
 				}
 
 				//if we pass by a correct haz or tuhur, make it aadat
