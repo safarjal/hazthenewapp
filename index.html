@@ -511,6 +511,40 @@
 								var startTimeOfIstihazaAfter = endTimeOfHaz;
 								var endTimeOfIstihazaAfter = addTimeToDate(startTimeOfIstihazaAfter, istihazaAfter);
 
+								startTimeOfIstihazaBefore = formatDateTime(startTimeOfIstihazaBefore);
+								endTimeOfIstihazaBefore = formatDateTime(endTimeOfIstihazaBefore);
+								startTimeOfHaz = formatDateTime(startTimeOfHaz);
+								endTimeOfHaz = formatDateTime(endTimeOfHaz);
+								startTimeOfIstihazaAfter = formatDateTime(startTimeOfIstihazaAfter);
+								endTimeOfIstihazaAfter = formatDateTime(endTimeOfIstihazaAfter);
+
+
+
+								function formatDateTime(date){
+									//Sat Feb 13 2021 00:00:00 GMT+0500 (Pakistan Standard Time)
+									date = date.slice(0,24);//all GMT stuff removed
+									var dayOfWeek = date.slice(0,3);
+									var month = date.slice(4,7);
+									var day = date.slice(8,10);
+									var year = date.slice(11,15);
+									var hours = Number(date.slice(16,18));
+									var ampm = "am";
+									var minutes = date.slice(19,21);
+									var seconds = date.slice(22,24);
+									if (hours > 12){
+										hours = hours - 12;
+										ampm = "pm";
+									}if (hours == 0){
+										hours = 12;
+									}
+
+
+									date = `${hours}:${minutes} ${ampm} on ${month} ${day}, ${year}`
+									return (date);
+
+								}
+
+
 								// startTimeOfIstihazaBefore = formatDates(startTimeOfIstihazaBefore);
 								// endTimeOfIstihazaBefore = formatDates(endTimeOfIstihazaBefore);
 								// startTimeOfHaz = formatDates(startTimeOfHaz);
@@ -534,7 +568,7 @@
 								if(istihazaBefore>0){//if there is istihaza before
 									outputStringInDates = `${istihazaBeforeLine}${hazLine}`;
 									if(istihazaAfter>0){//if there is istihaza after as well
-										outputStringInDates = `${outputStringHukmLineInDates}${istihazaAfterLine}`;
+										outputStringInDates = `${outputStringInDates}${istihazaAfterLine}`;
 									}
 								}else{//there is no istihaza before, there must be istihaza after
 									outputStringInDates = `${hazLine}${istihazaAfterLine}`;
