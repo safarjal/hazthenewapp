@@ -219,6 +219,50 @@
 
 		var dima = [];
 
+		function submitDimaAthaarN(){
+			getValuesN();
+		}
+
+		function getValuesN(){
+			var value = gid("numberofdaysN").value;
+			var type = 5;//5 is not a type if it turns up 5, there's an error
+			if (value == "istimrar" || value == "istimraar" || value == " istimraar"|| value == "istimraar " || value == " istimraar " || value == " istimrar" || value == "istimrar " || value == " istimrar " || value == "Istimrar" || value == "Istimraar" || value == " Istimraar"|| value == "Istimraar " || value == " Istimraar " || value == " Istimrar" || value == "Istimrar " || value == " Istimrar "){//alternative spellings for idiot proofing
+				value = -1; //we will use negative one for istimrar
+				gid("submitButtonN").disabled=true; //disable submit button, no additional values allowed
+			}
+			var damTuhurSpotN = document.getElementsByName("damtuhurspotN");
+			for (var i = 0, length = damTuhurSpotN.length; i < length; i++) {
+ 				 if (damTuhurSpotN[i].checked) {
+    				// do whatever you want with the checked radio
+    				type = damTuhurSpotN[i].value;
+
+  					// only one radio can be logically checked, don't check the rest
+    				break;
+  				}
+			}
+			if (value == 0 && type != 2){//if the type is not spot, the value shouldn't be zero. if it is, it's a mistake. do not do anything else
+				return;
+
+			}
+			if (value == -1){//if it's istimrar
+				type = 0; //if it was set to something else, it should be autocorrected to dam. someone made a mistake
+			}
+			var textToPrint = printValues(value, type); //Step 1: Write all the info with arrows
+			gid("solutionN").innerHTML = `${textToPrint}`;
+
+			if (type == 2){ //convert spots to dam
+				type =0;
+			}
+
+			putValueInPeriodsArray(value,type);
+//			var fixedPeriods = fixPeriodsArray();
+//			var periodsoutput = printPeriodsArray(fixedPeriods);
+//			gid("hall").innerHTML = `${periodsoutput}`;
+
+
+		}
+
+
 		function submitDimaAthaar(){
 			getValues();
 		}
@@ -455,6 +499,12 @@
 
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz);
 
+						var hukmString = answerToStringBiggerThanTen[0];
+						var hukmStringInDates = answerToStringBiggerThanTen[1];
+						var askAgainLine = answerToStringBiggerThanTen[2];
+
+						hukmString = `${hukmString}${hukmStringInDates}`;
+
 						// function addTimeMS(startDate, addedAmountInDays){
 						// 	var oldTime = new Date(gid("strtTime1").value)/60000; //This gives the date in minutes
 						// 	var additionalTime = Number(gid("addTimeMinutes").value) + 60*Number(gid("addTimeHours").value) + 60*24*Number(gid("addTimeDays").value); //This value is also in minutes
@@ -468,7 +518,8 @@
 
 
 						var currentPeriodOfFP = fixedPeriods[i];
-						currentPeriodOfFP.push(answerToStringBiggerThanTen);
+						currentPeriodOfFP.push(hukmString);
+						currentPeriodOfFP.push(askAgainLine);
 						fixedPeriods[i] = currentPeriodOfFP;
 
 
@@ -510,6 +561,50 @@
 								var endTimeOfHaz = addTimeToDate(startTimeOfHaz, haz);
 								var startTimeOfIstihazaAfter = endTimeOfHaz;
 								var endTimeOfIstihazaAfter = addTimeToDate(startTimeOfIstihazaAfter, istihazaAfter);
+
+								var askAgainLine = createAskAgainLine(startTimeOfCurrentPeriod,gp,hz,startTimeOfHaz,aadatTuhr);
+
+								function createAskAgainLine(startTimeOfCurrentPeriod,gp,hz,startTimeOfHaz,aadatTuhr){
+									var askAgainTime;
+									var askAgainLine = ``;
+									//when to ask again
+									if(qism == "A-3"){
+										//ask again if bleeding continues till start of aadat
+										askAgainTime = addTimeToDate(startTimeOfCurrentPeriod, gp);
+										var gapOf15 = ``;
+										if(askAgainTime - endTimeOfIstihazaAfter >= 15){
+											gapOf15 = `without a gap of 15 days or more, `;
+										}
+										askAgainLine = `Currently you are in a state of istihaza, yaqeeni paki, and you should continue your ibadaat. However if your bleeding continues to ${formatDateTime(askAgainTime)} ${gapOf15}you should ask again, as the soorat of the masla will have changed.<br>`
+
+									}else if (qism == "A-2"){
+										//ask again if bleeding continues till end of aadat.
+										//use hz, not aadat haiz, as aadat haiz changes.
+										askAgainTime = addTimeToDate(startTimeOfHaz,hz);
+										askAgainLine = `Currently you are in a state of haiz, and you should not pray or fast. If your bleeding continues to ${formatDateTime(askAgainTime)}, you should ask again.<br>`
+
+
+									}else{
+										//in A-1, B-2 and B-3 they all end with istihaza.
+										//ask again if bleeding continues to the next aadat.
+
+										askAgainTime = addTimeToDate(endTimeOfHaz, aadatTuhr);
+										var gapOf15 = ``;
+										if(askAgainTime - endTimeOfIstihazaAfter >= 15){
+											gapOf15 = `without a gap of 15 days or more, `;
+										}
+
+										askAgainLine = `Currently you are in a state of istihaza, yaqeeni paki, and you should continue your ibadaat. However if your bleeding continues to ${formatDateTime(askAgainTime)} ${gapOf15}you should ask again.<br>`
+
+									}
+									var writeDownInfoLine = `${tab}Please write down the date and time for the start or end of any bleeding or spotting you experience.<br>`;
+
+									askAgainLine = `${tab}${askAgainLine}${writeDownInfoLine}`;
+
+									return(askAgainLine);
+								}
+
+
 
 								startTimeOfIstihazaBefore = formatDateTime(startTimeOfIstihazaBefore);
 								endTimeOfIstihazaBefore = formatDateTime(endTimeOfIstihazaBefore);
@@ -556,8 +651,6 @@
 
 								var istihazaAfterLine = `${tab}From ${startTimeOfIstihazaAfter} to ${endTimeOfIstihazaAfter} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
 
-								var miscLines = `${tab}Please write down the date and time for the start or end of any bleeding or spotting you experience.<br>`;
-
 
 
 								var outputStringInDates = ``;
@@ -571,14 +664,15 @@
 									outputStringInDates = `${hazLine}${istihazaAfterLine}`;
 								}
 
-								outputStringInDates = `${outputStringInDates}${miscLines}`;
-								outputString = `${outputString}${outputStringInDates}`;
+
+
 							}
+							var output = [];
+							output[0] = outputString;
+							output[1] = outputStringInDates;
+							output[2] = askAgainLine;
 
-							return(outputString);
-
-							
-
+							return(output);							
 						}
 
 
@@ -688,7 +782,107 @@
 
 							var outputStringAadatLine = `${tab}Aadat: ${aadatHaiz}/${aadatTuhr} <br>`;
 							outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
-							return(outputString);
+//							return(outputString);
+
+							//write hukm in dates
+							if (startDateForQuestion != -1){//there is a date in this question
+								var startTimeOfIstihazaBefore = startTimeOfCurrentPeriod;
+								var endTimeOfIstihazaBefore = addTimeToDate(startTimeOfCurrentPeriod, istihazaBefore);
+								var startTimeOfHaz = endTimeOfIstihazaBefore;
+								var endTimeOfHaz = addTimeToDate(startTimeOfHaz, haz);
+
+								var askAgainLine = createAskAgainLine(startTimeOfCurrentPeriod,gp,hz,startTimeOfHaz,aadatTuhr);
+
+								function createAskAgainLine(startTimeOfCurrentPeriod,gp,hz,startTimeOfHaz,aadatTuhr){
+									var askAgainTime;
+									var askAgainLine = ``;
+
+									var writeDownInfoLine = `${tab}Please write down the date and time for the start or end of any bleeding or spotting you experience.<br>`;
+
+									askAgainLine = `${askAgainLine}${writeDownInfoLine}`;
+
+									return(askAgainLine);
+								}
+
+								startTimeOfIstihazaBefore = formatDateTime(startTimeOfIstihazaBefore);
+								endTimeOfIstihazaBefore = formatDateTime(endTimeOfIstihazaBefore);
+								startTimeOfHaz = formatDateTime(startTimeOfHaz);
+								endTimeOfHaz = formatDateTime(endTimeOfHaz);
+	
+								var tuhur1EndTime = addTimeToDate(endTimeOfHaz, aadatTuhr);
+								var haiz1EndTime = addTimeToDate(tuhur1EndTime, aadatHaiz);
+								var tuhur2EndTime = addTimeToDate(haiz1EndTime, aadatTuhr);
+								var haiz2EndTime = addTimeToDate(tuhur2EndTime, aadatHaiz);
+								var tuhur3EndTime = addTimeToDate(haiz2EndTime, aadatTuhr);
+								var haiz3EndTime = addTimeToDate(tuhur3EndTime, aadatHaiz);
+
+								tuhur1EndTime = formatDateTime(tuhur1EndTime);
+								haiz1EndTime = formatDateTime(haiz1EndTime);
+								tuhur2EndTime = formatDateTime(tuhur2EndTime);
+								haiz2EndTime = formatDateTime(haiz2EndTime);
+								tuhur3EndTime = formatDateTime(tuhur3EndTime);
+								haiz3EndTime = formatDateTime(haiz3EndTime);
+
+								function formatDateTime(date){
+									//Sat Feb 13 2021 00:00:00 GMT+0500 (Pakistan Standard Time)
+									date = date.slice(0,24);//all GMT stuff removed
+									var dayOfWeek = date.slice(0,3);
+									var month = date.slice(4,7);
+									var day = Number(date.slice(8,10));
+									var year = date.slice(11,15);
+									var hours = Number(date.slice(16,18));
+									var ampm = "am";
+									var minutes = date.slice(19,21);
+									var seconds = date.slice(22,24);
+									if (hours > 12){
+										hours = hours - 12;
+										ampm = "pm";
+									}if (hours == 0){
+										hours = 12;
+									}
+
+									if (hours == 12 && minutes == "00" && ampm == "am"){
+										date = `${month} ${day}, ${year}`;
+
+									}else{
+										date = `${hours}:${minutes} ${ampm} on ${month} ${day}, ${year}`;
+									}
+
+
+									return (date);
+
+								}
+
+								var istihazaBeforeLine = `${tab}From ${startTimeOfIstihazaBefore} to ${endTimeOfIstihazaBefore} is istihaza, yaqeeni paki. If you didn't pray namaz or keep roza in these dates, due to the assumption of haiz, you must repeat these namaz and rozas.<br>`;
+
+								var hazLine = `${tab}From ${startTimeOfHaz} to ${endTimeOfHaz} are your haiz dates. Any prayers or fasts in this time are null and void.<br>`;
+
+								var daurLine = `${tab}From ${endTimeOfHaz} there will be a cycle of ${aadatTuhr} days of tuhur and ${aadatHaiz} days of haiz. The first 3 cycles are as follows:<br>&nbsp;<br>`;
+								daurLine = `${daurLine}${tab}From ${endTimeOfHaz} to ${tuhur1EndTime} is tuhur. <br>`;
+								daurLine = `${daurLine}${tab}From ${tuhur1EndTime} to ${haiz1EndTime} is haiz. <br>`;
+								daurLine = `${daurLine}${tab}From ${haiz1EndTime} to ${tuhur2EndTime} is tuhur. <br>`;
+								daurLine = `${daurLine}${tab}From ${tuhur2EndTime} to ${haiz2EndTime} is haiz. <br>`;
+								daurLine = `${daurLine}${tab}From ${haiz2EndTime} to ${tuhur3EndTime} is tuhur. <br>`;
+								daurLine = `${daurLine}${tab}From ${tuhur3EndTime} to ${haiz3EndTime} is haiz. <br>`;
+
+
+
+								var outputStringInDates = ``;
+
+								if(istihazaBefore>0){//if there is istihaza before
+									outputStringInDates = `${istihazaBeforeLine}${hazLine}${daurLine}`;
+								}else{//there is no istihaza before, there must be istihaza after
+									outputStringInDates = `${hazLine}${daurLine}`;
+								}
+	
+								
+								var output = [];
+								output[0] = outputString;
+								output[1] = outputStringInDates;
+								output[2] = askAgainLine;
+
+								return(output);							
+							}
 
 						}
 						var currentPeriodOfFP = fixedPeriods[i];
@@ -702,6 +896,73 @@
  			return(hazTuhrArray); 			
  		}
 
+ 		function fixPeriodsArrayN(){
+			//create a copy of periods array. don't mess with the original
+			var fixedPeriods = copy(periods);
+			//add positions as fixedPeriods[2]
+			for (var i=0; i<fixedPeriods.length; i++){
+				var currentPeriod = [];
+				var positions = [i]; 
+				//Why is this an array? check later
+				//because we often store more than one position.
+
+				currentPeriod = fixedPeriods[i];
+				currentPeriod.push(positions);
+				fixedPeriods[i] = currentPeriod;
+			}
+
+			//Step 0 : Join Muttasil periods of the same type
+			//Let it do this to clean up clutter
+			fixedPeriods = joinMuttasilPeriods(fixedPeriods);
+
+			//Step 1: Go through all the periods. mark all tuhurs of less than 15 days, surrounded by dam on either side, as dam
+			//And even this
+			fixedPeriods = removeTuhrENaaqis(fixedPeriods);
+
+
+
+			//Step 2: Add up all dam in muddat-e-nifaas.
+
+			var damInMuddateNifaas = 0;
+
+			for (var i = 0; i < fixedPeriods.length - 1; i++) {
+				var currentPeriod = fixedPeriods[i];
+				var nextPeriod = fixedPeriods[(i+1)];
+
+
+				if (currentPeriod[0] > -1){//if it is not istimrar, add em all up, dams and tuhurs
+					damInMuddateNifaas = damInMuddateNifaas + currentPeriod[0];
+					if (damInMuddateNifaas > 40){
+						if (currentPeriod[1] == 1){//if it ended at a tuhur (which must be greater than 15)
+							damInMuddateNifaas = damInMuddateNifaas - currentPeriod[0];
+							//announce a new aadat for nifas
+							//remove this amount from fixed periods
+							//run periods on the remaing bit.
+							break;
+						}else{//if it ended at a dam
+							//get aadat of nifaas. subtract it from dam in muddat-e-nifas. make that nifas. announce it.
+							//all the leftover dam, mark it as istihaza. give it the istihaza check (which hasn't been written yet.)
+
+						}
+
+					}
+				}
+			}
+//			return(fixedPeriods);
+
+
+			// //Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
+			// fixedPeriods = removeDamLessThanThree(fixedPeriods);
+
+
+			// //Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
+			// var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
+
+			return(fixedPeriods);
+
+
+		}
+
 
 
 		function fixPeriodsArray(){
@@ -711,6 +972,10 @@
 			for (var i=0; i<fixedPeriods.length; i++){
 				var currentPeriod = [];
 				var positions = [i];
+
+				//Why is this an array? check later
+				//because we often store more than one position.
+
 
 				currentPeriod = fixedPeriods[i];
 				currentPeriod.push(positions);
@@ -856,6 +1121,7 @@
 			return(stringOfSums);
 		}
 
+
 		function printPeriodsArray(fixedPeriods){
 			var periodsoutput = "Solution: <br>";
 			for (var i = 0; i < fixedPeriods.length; i++) {
@@ -985,8 +1251,18 @@
   				}
 			}
 
+			if (type == 3){//istimrar
+				type = 0;
+				value = -1;
+				endTime = startTime;
+				gid("strtTimeMS").disabled = true;
+				gid("endTimeMS").disabled = true;
+				gid("submitButtonMS").disabled = true;
 
-			if (endTime<=startTime && type != 2){
+			}
+
+
+			if (endTime<=startTime && type != 2 && value != -1){
 				return;
 			}else if (endTime<=startTime && type == 2){
 				value = 0;
@@ -1034,14 +1310,21 @@
 
 
 				var typeInString = "";
-				if (type == 0){
+				if (type == 0 && value != -1){
 					typeInString = "dam";
 				}else if (type == 1){
 					typeInString = "tuhur";
 				}else if (type == 2){
 					typeInString = "spotting";
 				}
-				dates = `${dates}<br>${startTime} - ${endTime} = ${roundToNearestTenth(value)} days of ${typeInString}`;
+
+				if (type == 0 && value == -1){
+					dates = `${dates}<br>Istimrar starting from ${startTime}`;
+				}else{
+					dates = `${dates}<br>${startTime} - ${endTime} = ${roundToNearestTenth(value)} days of ${typeInString}`;
+				}
+
+				
 				if (dates.slice(0,4)== "<br>") {//if it starts with a linebreak, remove it
 					dates=dates.slice(4);
 				}
@@ -1060,7 +1343,9 @@
 			var fixedPeriods = fixPeriodsArray();
 			var periodsoutput = printPeriodsArray(fixedPeriods);
 			gid("hallMS").innerHTML = `${periodsoutput}`
+
 			switchValues();//switvh value of start time and endtime
+
 
 			function switchValues(){
 				gid("strtTimeMS").value = gid("endTimeMS").value;
@@ -1082,9 +1367,9 @@
 			gid("aadatTextMS").innerHTML = ``;
 			gid("aadatMS").value = "";
 			gid("strtTimeMS").disabled = false;
-
-
-
+			gid("endTimeMS").disabled = false;
+			gid("submitButtonMS").disabled = false;
+			
 		}
 
 		var givenAadatOfHaiz=-1;
@@ -1246,6 +1531,7 @@
 		<tr><td><input type="radio" id="damRadioMS" name="damtuhurspotMS" value="0">Dam</td></tr>
 		<tr><td><input type="radio" id="tuhurRadioMS" name="damtuhurspotMS" value="1">Tuhur</td></tr>
 		<tr><td><input type="radio" id="spotRadioMS" name="damtuhurspotMS" value="2">Spot</td></tr>
+		<tr><td><input type="radio" id="spotRadioMS" name="damtuhurspotMS" value="3">Istimrar</td></tr>
 	</table>
 	<input type="button" value="Submit" id="submitButtonMS" onclick="submitMS()">
 	<input type="button" value="Reset" onclick="resetMS()"><br>
@@ -1262,11 +1548,32 @@
 
 	<p><span id="hallMS"></span></p>
 
-
-
-
-
   	<hr>
+
+  	<p>!!!!Under Construction!!!!Nifaas ka Sawaal !!!Is Not Done Yet!!!!</p>
+	<table>
+		<tr><td>Adat:</td></tr>
+		<tr><td>Haiz</td><td><input type="text" id="aadatN" onchange="onChangeAadatN()" value=""></td></tr>
+		<tr><td>Tuhr</td><td><input type="text" id="aadatN" onchange="onChangeAadatN()" value=""></td></tr>
+		<tr><td>Nifaas</td><td><input type="text" id="aadatN" onchange="onChangeAadatN()" value=""></td></tr>
+	</table>
+	<p>&nbsp;</p>
+  	<p>Wiladat kay baad khoon ki tarteeb</p>
+	<input type="text" id="numberofdaysN" value="0"><label for="numberofdaysN">Days</label><br>
+	<input type="radio" id="dam1N" name="damtuhurspotN" value="0">
+	<label for="dam1N">Dam</label><br>
+	<input type="radio" id="tuhur1N" name="damtuhurspotN" value="1">
+	<label for="tuhur1N">Tuhur</label><br>
+	<input type="radio" id="spot1N" name="damtuhurspotN" value="2">
+	<label for="spot1N">Spot</label><br>
+
+	<input type="button" value="Submit" id="submitButtonN" onclick="submitDimaAthaarN()">
+	<input type="button" value="Reset" onclick="resetDimaAthaarN()"><br>
+
+
+	<p><span id="solutionN"></span></p>
+
+	<p><span id="hallN"></span></p>
 
 	
 	
