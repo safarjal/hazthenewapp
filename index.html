@@ -144,7 +144,6 @@
 			}
 		}
 
-
 		
 		function gid(id) { return document.getElementById(id) }
 		function start() {
@@ -167,9 +166,6 @@
 				gid('samegp').innerHTML = namegp == 'gp' ? 'remains the same' : 'changes to';
 				gid('valgp').innerHTML = valgp
 			}
-
-			
-
 			const inputs = ['mpdays', 'mphours', 'mpminutes', 
 							'gpdays', 'gphours', 'gpminutes', 
 							'dmdays', 'dmhours', 'dmminutes', 
@@ -187,6 +183,8 @@
 				var dm = dmdays + (dmhours/24) + (dmminutes/(24*60));
 				var hz = hzdays + (hzhours/24) + (hzminutes/(24*60));
 
+
+				
 				gid('dam').innerHTML = daysHoursMinutes(dm);
 				if (mp <= gp) {    //Qism A
 					gid('comp').innerHTML = '&leq;';
@@ -367,20 +365,6 @@
 			periods.push(period);
 		}
 
-		// function daysHoursMinutes(days){
-		// 		days = days*24*60; //This is actually in minutes now
-		// 		var minutes=days%60;								
-		// 		days = (days - minutes)/60; //now days is in hours
-		// 		var hours = days % 24;
-		// 		var days = (days - hours)/24;
-		// 		minutes=Math.round(minutes);
-		// 		hours=Math.round(hours);
-		// 		days=Math.round(days);
-		// 		var returnStatement = `${days} days, ${hours} hours, ${minutes} minutes`;
-		// 		return(returnStatement);
-		// }
-
-
 		function copy(aObject) {
  			if (!aObject) {
  			   return aObject;
@@ -457,7 +441,6 @@
  		}
 
  		function removeDamLessThanThree(fixedPeriods){
-
 			for (var i = 1; i < fixedPeriods.length - 1; i++) {
 				var previousPeriod = fixedPeriods[i-1];
 				var currentPeriod = fixedPeriods[i];
@@ -508,11 +491,8 @@
  			return (date);
 
  		}
+
  		function createAskAgainLineForIstimrar(endTimeOfHaz,aadatTuhr, aadatHaiz){
- 			
-
-
-
  			var now = new Date();
 
  			var diff = Math.abs((new Date(now)- new Date(endTimeOfHaz))/60000); //This gives the diff in minutes
@@ -599,24 +579,21 @@
 
  			var outputStringAadatLine = `${tab}Aadat: ${daysHoursMinutes(aadatHaiz)}/${daysHoursMinutes(aadatTuhr)} <br>`;
  			outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
-
+ 			outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`;
  			//write hukm in dates
  			if (startDateForQuestion != -1){//there is a date in this question
  				var startTimeOfIstihazaBefore = startTimeOfCurrentPeriod;
  				var endTimeOfIstihazaBefore = addTimeToDate(startTimeOfCurrentPeriod, istihazaBefore);
  				var startTimeOfHaz = endTimeOfIstihazaBefore;
  				var endTimeOfHaz = addTimeToDate(startTimeOfHaz, haz);
-
  				var askAgainLine = createAskAgainLineForIstimrar(endTimeOfHaz,aadatTuhr, aadatHaiz);
 
- 		
  				var tuhur1EndTime = addTimeToDate(endTimeOfHaz, aadatTuhr);
  				var haiz1EndTime = addTimeToDate(tuhur1EndTime, aadatHaiz);
  				var tuhur2EndTime = addTimeToDate(haiz1EndTime, aadatTuhr);
  				var haiz2EndTime = addTimeToDate(tuhur2EndTime, aadatHaiz);
  				var tuhur3EndTime = addTimeToDate(haiz2EndTime, aadatTuhr);
  				var haiz3EndTime = addTimeToDate(tuhur3EndTime, aadatHaiz);
-
 
  				var istihazaBeforeLine = `${tab}From ${formatDateTime(startTimeOfIstihazaBefore)} to ${formatDateTime(endTimeOfIstihazaBefore)} is istihaza, yaqeeni paki. If you didn't pray namaz or keep roza in these dates, due to the assumption of haiz, you must repeat these namaz and rozas.<br>`;
 
@@ -651,7 +628,6 @@
 
  		}
 
-
  		function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod){
 
  			var outputString = "";
@@ -659,7 +635,7 @@
  			var outputStringHukmLine = `${tab}Hukm: Out of ${daysHoursMinutes(dm)} of dam, the first `;
 
  			if(istihazaBefore>0){//if there is istihaza before
- 				outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(istihazaBefore)} are istihaza`;
+	 			outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(istihazaBefore)} are istihaza`;
  				if(istihazaAfter>0){//if there is istihaza after as well
  					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
  				}else{//if there is no istihaza after
@@ -670,7 +646,7 @@
  			}
 
  			var outputStringAadatLine = `${tab}Aadat: ${daysHoursMinutes(aadatHaiz)}/${daysHoursMinutes(aadatTuhr)} <br>`;
- 			outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
+  			outputString = `${outputStringTitleLine}${outputStringAadatLine}${outputStringHukmLine} <br>`
 
  			//write hukm in dates
  			if (startDateForQuestion != -1){//there is a date in this question
@@ -730,8 +706,6 @@
 			}
 
 			var startTimeOfCurrentPeriod = 0;
-
-
 
 			for (var i = 1; i < hazTuhrArray.length; i++) {
 				//go through all the periods
@@ -794,19 +768,6 @@
 							aadatTuhr = mp;//aadatTuhr was gp, only changes to mp if not faasid
 						}
 
-						//working here
-
-						//experimental untested while loop to check a super long period. Said teacher, we will study this later
-
-						// while(istihazaAfter>=aadatTuhr+3){
-						// 	var remainingDam=istihazaAfter-aadatTuhr;
-						// 	if(remainingDam>10){
-						// 		istihazaAfter=remainingDam-aadatHaiz;
-						// 	}else{
-						// 		aadatHaiz=remainingDam;
-						// 	}
-						// }
-
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod);
 
 						var hukmString = answerToStringBiggerThanTen[0];
@@ -822,10 +783,6 @@
 						fixedPeriods[i] = currentPeriodOfFP;
 
 
-
-
-
-						//in istimrar, we gotta not look at istihaza after.
 
 
 						//add istihaza before to the previous tuhr and mark tuhr as faasid
@@ -1328,42 +1285,7 @@
 
 			printDates(startTime, endTime, value, type);
 
-			// function formatDates(date){
-			// 	var day = date.slice(8,10);
-			// 	var month = date.slice(5,7);
-			// 	if (month == "01"){
-			// 		month = "January";
-			// 	}else if (month == "02"){
-			// 		month = "February";
-			// 	}else if (month == "03"){
-			// 		month = "March";
-			// 	}else if (month == "04"){
-			// 		month = "April";
-			// 	}else if (month == "05"){
-			// 		month = "May";
-			// 	}else if (month == "06"){
-			// 		month = "June";
-			// 	}else if (month == "07"){
-			// 		month = "July";
-			// 	}else if (month == "08"){
-			// 		month = "August";
-			// 	}else if (month == "09"){
-			// 		month = "September";
-			// 	}else if (month == "10"){
-			// 		month = "October";
-			// 	}else if (month == "11"){
-			// 		month = "November";
-			// 	}else if (month == "12"){
-			// 		month = "December";
-			// 	}
-
-			// 	var year = date.slice(0,4);
-
-			// 	return(`${day} ${month}, ${year}`);
-			// }
-
 			function printDates(startTime, endTime, value, type){
-
 				startTime=formatDateTime(`${new Date(startTime)}`);
 				endTime=formatDateTime(`${new Date(endTime)}`);
 
