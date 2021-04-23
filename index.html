@@ -72,12 +72,15 @@
 				hours=Math.round(hours);
 				days=Math.round(days);
 				if (days == 0){days = ``;} 
+				else if(days == 1){days = `1 day`;}
 				else{days = `${days} days`;}
 
 				if (hours == 0){hours = ``; }
+				else if (hours == 1){hours = `1 hour`;}
 				else{hours = `${hours} hours`;}
 
-				if (minutes ==0){minutes = ``;}
+				if (minutes == 0){minutes = ``;}
+				else if(minutes == 1){minutes = `1 minute`;}
 				else{minutes = `${minutes} minutes`;}
 
 				var returnStatement;
@@ -536,6 +539,8 @@
  		function createAskAgainLineForDamBiggerThan10(startTimeOfCurrentPeriod,gp,hz,startTimeOfHaz,endTimeOfHaz, endTimeOfIstihazaAfter, aadatTuhr, qism){
  			var askAgainTime;
  			var askAgainLine = ``;
+ 			var now = new Date();
+
  			//when to ask again
  			if(qism == "A-3"){
  				//ask again if bleeding continues till start of aadat
@@ -566,8 +571,13 @@
  				askAgainLine = `Currently you are in a state of istihaza, yaqeeni paki, and you should continue your ibadaat. However if your bleeding continues to ${formatDateTime(askAgainTime)} ${gapOf15}you should ask again.<br>`
 
  			}
+ 			askAgainLine = `${tab}${askAgainLine}`;
+
+ 			if(new Date(askAgainTime)<now){//if ask again time has already passed, there is no point to issing an ask again line,
+ 				askAgainLine = ``;
+ 			}
  			var writeDownInfoLine = `${tab}Please write down the date and time for the start or end of any bleeding or spotting you experience.<br>`;
- 			askAgainLine = `${tab}${askAgainLine}${writeDownInfoLine}`;
+ 			askAgainLine = `${askAgainLine}${writeDownInfoLine}`;
  			return(askAgainLine);
  		}
 
@@ -697,6 +707,9 @@
 
 
  		function dealWithBiggerThanTenDam(fixedPeriods){
+ 			//This returns the hazTuhurArray. It also pushes solution text into fixedperiods array
+
+
  			//create a copy of fixed periods. don't mess with the original
  			var hazTuhrArray = copy(fixedPeriods);
 
@@ -1144,6 +1157,12 @@
 			var periodsoutput = "Solution: <br>";
 			for (var i = 0; i < fixedPeriods.length; i++) {
 				var period = fixedPeriods[i];
+				//period[0] is duration
+				//period[1] is type
+				//istimrar is duration -1, type dam 0
+				//spot is duration 0, type dam 0
+				//spotting is regular dam 0
+				//period[2] contains positions info which helps generate the string of sums
 				if (period[1]==1){//tuhur
 					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} tuhur</b> <br>`;
 
@@ -1168,20 +1187,32 @@
 					periodsoutput = `${periodsoutput} ${stringOfSums}`;
 				}
 				var checkNextTuhur;
-				if(period[1]==0 && period [0]>10){ //for period bigger than 10
-					if(period.length>3){
+				//until now, periods output contains the bolded line under solution, and a string of sums under it, if necessary.
+
+				//period[3] contains the solution, in duration, and in dates, if there are dates
+				//period[4] contains ask again line, only to be inclded after the last entry
+
+
+				if(period[1]==0 && period[0]>10){ //for period bigger than 10
+					if(period.length>3){//if there is a solution (if no adat, there wouldn't be)
 						periodsoutput = `${periodsoutput}${period[3]}`;
 						checkNextTuhur = 1;
 					}
 				}
-				if(checkNextTuhur==1 && (period[1]==1 || period[1]==3)){
+				if(checkNextTuhur==1 && (period[1]==1 || period[1]==3)){//if there is a solution, there is a chance that tuhur after that will have added istihaza line, so check for that,
 					checkNextTuhur = 0;
 					if(period.length>=4){
 						periodsoutput = `${periodsoutput}${period[3]}`;
 					}
 				}
 				if(period[1]==0 && period [0]==-1){ //for istimrar
-					periodsoutput = `${periodsoutput}${period[3]}`;
+					if(period.length>3){//if there is a solution (if no adat, there wouldn't be)
+						periodsoutput = `${periodsoutput}${period[3]}`;
+					}
+				}
+				if(i == fixedPeriods.length-1 && period.length>=5){//if this is the last period and there is an askagainLine(period[4])
+					periodsoutput = `${periodsoutput}<br>&nbsp;<br>${period[4]}`;
+
 				}
 
 			}
