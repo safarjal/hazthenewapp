@@ -927,7 +927,7 @@
 							hazTuhrArray[i-1]=previousPeriod;
 						}
 
-						currentPeriod[0]= result[1]; //resize this to haz
+						currentPeriod[0]= result[1]; //resize this period to haz
 						hazTuhrArray[i] = currentPeriod;
 
 
@@ -962,64 +962,61 @@
 									//move hazthurarray one up
 									i=i+1;
 								}
-							}
-
-							else{//if it's an extremely long period
-
-								//add amount of newIstihazafter to the next period mark it as fasid.
-								
-								if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
-
-									var nextPeriodFP = fixedPeriods[k+1];
-		
-									var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${nextPeriodFP[0]+newIstihazaAfter} tuhr-e-faasid<br>`;
-									nextPeriodFP.push(outputString);
-
-
-									fixedPeriods[k+1] = nextPeriodFP;
-
-									var nextPeriod=hazTuhrArray[i+1];
-
-									nextPeriod[0] = nextPeriod[0] + newIstihazaAfter; //add istihaza to it
-									nextPeriod[1] = 3;//mark it as tuhr faasid
-
-									hazTuhrArray[i+1] = nextPeriod;
-
-
-
-								}else{//there is no paki in front of it
-									//create a new period
-									var nextPeriod = [newIstihazaAfter, 3];
-									hazTuhrArray.push(nextPeriod);
-									//move i one forward
-									i=i+1;
-								}
+							}else{//it is an extremely long period
+								//add the dividend number of periods of haz and tuhur
 
 								//add periods of haz and tuhur for the daur time in haztuhurarray
 								for (var j=0; j<dividend; j++){//add the right number of cycles
 									var nextTuhrPeriod = [aadatTuhr, 3];
 									var nextHaizPeriod = [aadatHaiz, 0];
-									hazTuhrArray.splice(i,0,nextTuhrPeriod,nextHaizPeriod);
+									hazTuhrArray.splice(i+1,0,nextTuhrPeriod,nextHaizPeriod);
 									//move i forward with each
 									i = i+2;
 								}
-								//deal with remainder
+
+								//now deal with remainder
 								if(remainder>=aadatTuhr+3){//ends in tuhr + haiz
 									var nextTuhrPeriod = [aadatTuhr, 3];
 									var nextHaizPeriod = [newAadatHaiz, 0];
 									hazTuhrArray.splice(i+1,0,nextTuhrPeriod,nextHaizPeriod);
 									i = i+2;
-
-								}else{//ends in tuhur
-									//this potion has already been dealt with
-								}
-
-
-								//update haiz aadat amount
-								if (aadatHaiz!=-1){
+									//as aadat of haiz changes, let's do that now
 									aadatHaiz = newAadatHaiz;
-								}
 
+
+								}else{//remainder ends in tuhur
+									//add amount of newIstihazafter to the next period mark it as fasid.
+									if(newIstihazaAfter>0){
+										if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
+
+											var nextPeriodFP = fixedPeriods[k+1];
+										
+											var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${nextPeriodFP[0]+newIstihazaAfter} tuhr-e-faasid<br>`;
+											nextPeriodFP.push(outputString);
+
+
+											fixedPeriods[k+1] = nextPeriodFP;
+
+											var nextPeriod=hazTuhrArray[i+1];
+
+											nextPeriod[0] = nextPeriod[0] + newIstihazaAfter; //add istihaza to it
+											nextPeriod[1] = 3;//mark it as tuhr faasid
+
+											hazTuhrArray[i+1] = nextPeriod;
+
+
+
+										}else{//there is no paki in front of it
+											//create a new period
+											var nextPeriod = [newIstihazaAfter, 3];
+											hazTuhrArray.push(nextPeriod);
+											//move i one forward
+											i=i+1;
+										}
+									}else{
+										//if it is zero, then it ends at the exact moment of aadat, I guess. we do nothing.
+									}									
+								}
 							}
 						}
 
