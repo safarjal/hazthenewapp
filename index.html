@@ -601,6 +601,7 @@
  				var endTimeOfIstihazaBefore = addTimeToDate(startTimeOfCurrentPeriod, istihazaBefore);
  				var startTimeOfHaz = endTimeOfIstihazaBefore;
  				var endTimeOfHaz = addTimeToDate(startTimeOfHaz, haz);
+
  				var askAgainLine = createAskAgainLineForIstimrar(endTimeOfHaz,aadatTuhr, aadatHaiz);
 
  				var tuhur1EndTime = addTimeToDate(endTimeOfHaz, aadatTuhr);
@@ -643,7 +644,8 @@
 
  		}
 
- 		function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod){
+
+ 		function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter){
 
  			var outputString = "";
  			var outputStringTitleLine = `${tab}${daysHoursMinutesDigital(mp)}${tab}${daysHoursMinutesDigital(gp)}${tab}${daysHoursMinutesDigital(dm)}${tab}${daysHoursMinutesDigital(hz)}${tab}${qism}<br>`;
@@ -652,12 +654,52 @@
  			if(istihazaBefore>0){//if there is istihaza before
 	 			outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(istihazaBefore)} are istihaza`;
  				if(istihazaAfter>0){//if there is istihaza after as well
- 					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
+ 					if(newIstihazaAfter!=-1){//this is if it's a long istihaza. it'll either be 0, or another value.
+	 					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, `;
+	 					var repeatingLine = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(aadatHaiz)} are haiz, `;
+	 					var line2 = ``;
+	 					var line3 = ``;
+	 					for (var i=0; i<dividend; i++){//repeat this line the correct nmber of cycles.
+	 						line2 = `${line2}${repeatingLine}`;
+	 					}
+	 					if(remainder>=aadatTuhr+3){
+		 					 line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz. <br>${tab} Aadat is now ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.`;
+	 					}else{
+	 						line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+
+	 					}
+	 					outputStringHukmLine = `${outputStringHukmLine}${line2}${line3}<br>`;
+
+ 					}else{
+	 					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
+ 					}
  				}else{//if there is no istihaza after
  					outputStringHukmLine = `${outputStringHukmLine} and the next ${daysHoursMinutes(haz)} are haiz.<br>`;
  				}
  			}else{//there is no istihaza before, there must be istihaza after
- 				outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
+ 				if(newIstihazaAfter!=-1){//this is if it's a long istihaza. it'll either be 0, or another value.
+ 					outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(haz)} are haiz, `;
+
+	 				var repeatingLine = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(aadatHaiz)} are haiz, `;
+	 				var line2 = ``;
+	 				var line3 = ``;
+	 				for (var i=0; i<dividend; i++){//repeat this line the correct nmber of cycles.
+	 					line2 = `${line2}${repeatingLine}`;
+	 				}
+	 				if(remainder>=aadatTuhr+3){
+		 				 line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz. <br>${tab} Aadat is now ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.`;
+	 				}else{
+	 					line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+
+	 				}
+	 				outputStringHukmLine = `${outputStringHukmLine}${line2}${line3}<br>`;
+
+
+
+ 				}else{//if istihaza after isn't long
+ 					outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
+
+ 				}
  			}
 
  			var outputStringAadatLine = `${tab}Aadat: ${daysHoursMinutes(aadatHaiz)}/${daysHoursMinutes(aadatTuhr)} <br>`;
@@ -678,8 +720,43 @@
 
  				var hazLine = `${tab}From ${formatDateTime(startTimeOfHaz)} to ${formatDateTime(endTimeOfHaz)} are your haiz dates. Any prayers or fasts in this time are null and void.<br>`;
 
- 				var istihazaAfterLine = `${tab}From ${formatDateTime(startTimeOfIstihazaAfter)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
+ 				var istihazaAfterLine = ``;
 
+ 				if(newIstihazaAfter!=-1){//there is a super long period
+ 					var sTOfIstihaza = startTimeOfIstihazaAfter;
+ 					var eTOfIstihaza;
+ 					var sTOfHaz;
+ 					var eTOfHaz;
+
+ 					var dateLine = `'`
+
+ 					for (var i=0; i<dividend; i++){//the right number of cycles
+ 						eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
+ 						sTOfHaz = eTOfIstihaza;
+ 						eTOfHaz = addTimeToDate(sTOfHaz, aadatHaiz);
+ 						dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki.<br>
+ 							${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(eTOfHaz)} is haiz.<br> `;
+ 						sTOfIstihaza = eTOfHaz;
+ 					}
+ 					//deal with remainder
+ 					if(remainder>=aadatTuhr+3){//ends in haiz
+ 						eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
+ 						sTOfHaz = eTOfIstihaza;
+ 						dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki.<br>
+ 							${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(endTimeOfIstihazaAfter)} is haiz.<br> 
+ 							${tab}Aadat is now ${daysHoursMinutes(newAadatHaiz)} haiz and ${daysHoursMinutes(aadatTuhr)} tuhur.<br>`;
+
+ 					}else{//ends in thur
+ 						dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki.<br>`;
+ 					}
+ 					istihazaAfterLine = dateLine;
+
+
+
+ 				}else{//there is no super long period
+ 					istihazaAfterLine = `${tab}From ${formatDateTime(startTimeOfIstihazaAfter)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
+
+ 				}
 
 
  				var outputStringInDates = ``;
@@ -704,6 +781,21 @@
  			return(output);							
  		}
 
+ 		function solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr){
+ 			var dividend = Math.floor(istihazaAfter/(aadatHaiz+aadatTuhr));//how many complete cycles of tuhr followed by haiz
+ 			var remainder = istihazaAfter % (aadatHaiz+aadatTuhr);//incomplete leftover after that
+ 			var newAadatHaiz = aadatHaiz;
+ 			var newIstihazaAfter = remainder;
+ 			if (remainder >= aadatTuhr+3){//it ends in haiz
+ 				newAadatHaiz=remainder-aadatTuhr; //the haiz aadat changes
+ 				newIstihazaAfter = 0; // there is no istihaza after it
+ 			}else{//it ends in tuhr
+
+ 			}
+ 			var output = [dividend, remainder, newAadatHaiz, newIstihazaAfter];
+ 			return(output);
+ 		}
+
 
 
  		function dealWithBiggerThanTenDam(fixedPeriods){
@@ -725,19 +817,28 @@
 
 			var startTimeOfCurrentPeriod = 0;
 
+			var k = 1;
+
+
 			for (var i = 1; i < hazTuhrArray.length; i++) {
+				//i is the count of haztuhurarray
+				//k is the count of fixed periods.
+
+
 				//go through all the periods
 
 				var currentPeriod = hazTuhrArray[i];
 				var previousPeriod = hazTuhrArray[i-1];
 
 				//if there is a starting date
+				//let's just get it from k, each time,
 				if(startDateForQuestion != -1){
+					var previousPeriodofFP = fixedPeriods[k-1];
 					if (startTimeOfCurrentPeriod == 0){
 						startTimeOfCurrentPeriod = startDateForQuestion;
 					}
 
-					startTimeOfCurrentPeriod= addTimeToDate(startTimeOfCurrentPeriod, previousPeriod[0]);
+					startTimeOfCurrentPeriod= addTimeToDate(startTimeOfCurrentPeriod, previousPeriodofFP[0]);
 				}
 
 				//if we pass by a correct haz or tuhur, make it aadat
@@ -781,12 +882,27 @@
 						var haz = result[1];
 						var istihazaAfter = result[2];
 
-						aadatHaiz = haz; //update aadat of haiz
+						aadatHaiz = Number(haz); //update aadat of haiz
 						if (result[3] == 1 && previousPeriod[1] == 1){//aadat of tuhr is changing, but only if mp is not faasid
 							aadatTuhr = mp;//aadatTuhr was gp, only changes to mp if not faasid
 						}
 
-						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod);
+
+						var dividend = -1;
+						var remainder = -1;
+						var newAadatHaiz = -1;
+						var newIstihazaAfter = -1;
+
+						if(istihazaAfter>aadatTuhr+3){//if we have a period that extends to the next aadat
+							var output = solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr);
+							var dividend = output[0];
+							var remainder = output[1];
+							var newAadatHaiz = output[2];
+							var newIstihazaAfter = output[3];
+//							var answerToLongIstihaza = printAnswerToLongIstihaza(dividend,remainder,newAadatHaiz,newIstihazaAfter);
+						}
+
+						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter);
 
 						var hukmString = answerToStringBiggerThanTen[0];
 						var hukmStringInDates = answerToStringBiggerThanTen[1];
@@ -795,18 +911,21 @@
 						hukmString = `${hukmString}${hukmStringInDates}`;
 
 
-						var currentPeriodOfFP = fixedPeriods[i];
+						var currentPeriodOfFP = fixedPeriods[k];
 						currentPeriodOfFP.push(hukmString);
 						currentPeriodOfFP.push(askAgainLine);
-						fixedPeriods[i] = currentPeriodOfFP;
+						fixedPeriods[k] = currentPeriodOfFP;
 
 
 
 
 						//add istihaza before to the previous tuhr and mark tuhr as faasid
-						previousPeriod[0]=previousPeriod+result[0]; //result[0] is istihaza before
-						previousPeriod[1]=3; //tuhr e faasid
-						hazTuhrArray[i-1]=previousPeriod;
+						//if isthaza before exists!
+						if(result[0]>0){
+							previousPeriod[0]=previousPeriod[0]+result[0]; //result[0] is istihaza before
+							previousPeriod[1]=3; //tuhr e faasid
+							hazTuhrArray[i-1]=previousPeriod;
+						}
 
 						currentPeriod[0]= result[1]; //resize this to haz
 						hazTuhrArray[i] = currentPeriod;
@@ -814,18 +933,18 @@
 
 
 						if (istihazaAfter>0 && currentPeriod[1] != -1){//there is an istihaza after it, and it ain't istimrar
-							//solving extremely long periods here
-							if (istihazaAfter<aadatTuhr+3){
+							//if it's not an extremely long periods here
+							if (remainder==-1){
 								//add it's amount to tuhur in front of it
 								if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
 
-									var nextPeriodFP = fixedPeriods[i+1];
+									var nextPeriodFP = fixedPeriods[k+1];
 		
 									var outputString = `${tab}${nextPeriodFP[0]} + ${istihazaAfter} istihaza = ${nextPeriodFP[0]+istihazaAfter} tuhr-e-faasid<br>`;
 									nextPeriodFP.push(outputString);
 
 
-									fixedPeriods[i+1] = nextPeriodFP;
+									fixedPeriods[k+1] = nextPeriodFP;
 
 									var nextPeriod=hazTuhrArray[i+1];
 
@@ -840,37 +959,70 @@
 									//create a new period
 									var nextPeriod = [istihazaAfter, 3];
 									hazTuhrArray.push(nextPeriod);
+									//move hazthurarray one up
+									i=i+1;
 								}
 							}
-//							working here
+
+							else{//if it's an extremely long period
+
+								//add amount of newIstihazafter to the next period mark it as fasid.
+								
+								if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
+
+									var nextPeriodFP = fixedPeriods[k+1];
+		
+									var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${nextPeriodFP[0]+newIstihazaAfter} tuhr-e-faasid<br>`;
+									nextPeriodFP.push(outputString);
 
 
-							else{//if it's greater than or equal aadat of tuhr +3
-								//divide istihaza after by sum of aadat haz and tuhur.
+									fixedPeriods[k+1] = nextPeriodFP;
 
-								var dividend = Math.floor(istihazaAfter/(aadatHaiz+aadatTuhr));
-								var remainder = istihazaAfter % (aadatHaiz+aadatTuhr);
+									var nextPeriod=hazTuhrArray[i+1];
 
-								if(remainder>=aadatTuhr+3){//remainder ends in haiz greater than 3
-									aadatHaiz = remainder - aadatTuhr;
+									nextPeriod[0] = nextPeriod[0] + newIstihazaAfter; //add istihaza to it
+									nextPeriod[1] = 3;//mark it as tuhr faasid
 
-								}else{//it ends in tuhur, or in less than 3 dam
-									istihazaAfter = remainder;
+									hazTuhrArray[i+1] = nextPeriod;
+
+
+
+								}else{//there is no paki in front of it
+									//create a new period
+									var nextPeriod = [newIstihazaAfter, 3];
+									hazTuhrArray.push(nextPeriod);
+									//move i one forward
+									i=i+1;
+								}
+
+								//add periods of haz and tuhur for the daur time in haztuhurarray
+								for (var j=0; j<dividend; j++){//add the right number of cycles
+									var nextTuhrPeriod = [aadatTuhr, 3];
+									var nextHaizPeriod = [aadatHaiz, 0];
+									hazTuhrArray.splice(i,0,nextTuhrPeriod,nextHaizPeriod);
+									//move i forward with each
+									i = i+2;
+								}
+								//deal with remainder
+								if(remainder>=aadatTuhr+3){//ends in tuhr + haiz
+									var nextTuhrPeriod = [aadatTuhr, 3];
+									var nextHaizPeriod = [newAadatHaiz, 0];
+									hazTuhrArray.splice(i+1,0,nextTuhrPeriod,nextHaizPeriod);
+									i = i+2;
+
+								}else{//ends in tuhur
+									//this potion has already been dealt with
 								}
 
 
-
-								var nextPeriod = [istihazaAfter-aadatTuhr, 0];
-								hazTuhrArray.splice(i+1,0,nextPeriod);//create new dam
-								nextPeriod = [aadatTuhr, 3];
-								hazTuhrArray.splice(i+1,0,nextPeriod);//create istihaza
+								//update haiz aadat amount
+								if (aadatHaiz!=-1){
+									aadatHaiz = newAadatHaiz;
+								}
 
 							}
 						}
 
-
-						//how come we aren;t talking about istihaza before???
-						//because it aint' relevant
 					}
 				}
 
@@ -910,6 +1062,13 @@
 						currentPeriodOfFP.push(answerToStringBiggerThanTen);
 						fixedPeriods[i] = currentPeriodOfFP;
 					}
+				}
+				//iterate k (count of fixed periods)
+
+				k=k+1;
+				if (k>=fixedPeriods.length){
+					//this should not happen.
+					break;
 				}
 
 			}
