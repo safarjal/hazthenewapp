@@ -728,7 +728,7 @@
  					var sTOfHaz;
  					var eTOfHaz;
 
- 					var dateLine = `'`
+ 					var dateLine = ``;
 
  					for (var i=0; i<dividend; i++){//the right number of cycles
  						eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
@@ -1064,7 +1064,7 @@
 
 				k=k+1;
 				if (k>=fixedPeriods.length){
-					//this should not happen.
+					//this should not happen except at the end of the periods.
 					break;
 				}
 
@@ -1404,6 +1404,73 @@
 			return(textToPrint);
 
 		}
+
+		function compareTwoHazTuhurArrays(haztuhur1, haztuhur2){
+			//not used yet, intended for zallah kay masail
+
+
+			//let's assume that the 2 arrays are a series of dates, the first thing in each array is the starttime of haz, the second one is the endtime, and so on.
+
+			var combinedArray = [];
+	
+			for(var i=0, i<haztuhur1.length, i++){
+				var date = haztuhur1[i];
+				var evenOdd = i % 2; //if even is 0, it's even, 1, it's odd
+				var array = [];
+				if (evenOdd == 0){
+					array = [date, "S1"];
+				}else{
+					array = [date, "E1"];
+				}
+				combinedArray.push(array);
+			}
+			for(var i=0, i<haztuhur2.length, i++){
+				var date = haztuhur2[i];
+				var evenOdd = i % 2; //if even is 0, it's even, 1, it's odd
+				var array = [];
+				if (evenOdd == 0){
+					array = [date, "S2"];
+				}else{
+					array = [date, "E2"];
+				}
+				combinedArray.push(array);
+			}
+
+			//this line ought to sort the array by date
+			combinedArray.sort(function(a, b){return a[0] - b[0]});
+
+			var outputString = ``;
+			//this loop ought to step through all the values, adding and subtracting counter as it goes.
+			for (var i=0, i<combinedArray.length, i++){
+				var currentArray = combinedArray[i];
+				var counter = 0;
+				if (currentArray[1] == "S1" || currentArray[1] == "S2"){
+					counter = counter + 1;
+				}else if (currentArray[1] == "E1" || currentArray[1] == "E2"){
+					counter = counter - 1;
+				}
+				//counter at 0 means both paki
+				//counter at 1 means one haz, one tuhur
+				//counter at 2 means both haz
+
+				if(i>0){//there is a previous value
+					var previousArray = combinedArray[i-1];
+					if (previousArray[0]!=currentArray[0]){//there is no point to a from/to, if the 2 values are identical
+						if(counter == 1 && i >0){//ayyam-e-shakk
+							outputString = `${outputString}From ${previousArray[0]} to ${currentArray[0]} are ayyam-e-shakk<br>`;
+						}else if(counter == 0 && i > 0){//paki
+							outputString = `${outputString}From ${previousArray[0]} to ${currentArray[0]} are yaqeeni paki<br>`;
+						}else if(counter == 2 && i > 0){//haz
+							outputString = `${outputString}From ${previousArray[0]} to ${currentArray[0]} are yaqeeni haiz<br>`;
+						}
+
+					}
+				}
+
+			}
+			return (outputString);
+		}
+
 
 		function resetDimaAthaar(){
 			textToPrint = "";
