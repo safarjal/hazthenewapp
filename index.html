@@ -320,13 +320,16 @@
 			}
 
 			putValueInPeriodsArray(value,type);
-//			var fixedPeriods = fixPeriodsArray();
-//			var periodsoutput = printPeriodsArray(fixedPeriods);
-//			gid("hall").innerHTML = `${periodsoutput}`;
+			var fixedPeriods = fixPeriodsArrayN();
+			var periodsoutput = printPeriodsArray(fixedPeriods);
+			gid("hallN").innerHTML = `${periodsoutput}`;
 
 
 		}
 
+		function submitDimaAthaarN(){
+			getValuesN();
+		}
 
 		function submitDimaAthaar(){
 			getValues();
@@ -796,7 +799,176 @@
  			return(output);
  		}
 
+ 		function printAnswerToNifaasBiggerThanForty(dividend,remainder,newAadatHaiz,newIstihazaAfter,aadatNifaas, aadatHaiz, aadatTuhr){
+ 			var outputStringHukmLine = `${tab}Starting from birth, the first ${daysHoursMinutes(aadatNifaas)} are nifaas, `;
 
+ 			if(newIstihazaAfter!=-1){//this is if it's a long istihaza. it'll either be 0, or another value.
+	 			var repeatingLine = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(aadatHaiz)} are haiz, `;
+	 			var line2 = ``;
+				var line3 = ``;
+	 			for (var i=0; i<dividend; i++){//repeat this line the correct nmber of cycles.
+	 				line2 = `${line2}${repeatingLine}`;
+	 			}
+	 			if(remainder>=aadatTuhr+3){
+	 				 line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz.`;
+	 			}else{
+	 				line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+
+	 			}
+	 			outputStringHukmLine = `${outputStringHukmLine}${line2}${line3}<br>`;
+			}else{//it isn't a long istihaza
+	 			outputStringHukmLine = `${outputStringHukmLine}then the remaining ${daysHoursMinutes(remainder)} are istihaza.`;
+
+	 		}
+	 		//aadat line
+	 		if (newAadatHaiz!=-1){
+			 	outputStringHukmLine = `${outputStringHukmLine}<br>${tab} Aadat is now ${daysHoursMinutes(aadatNifaas)} nifaas, ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.<br>`;
+ 			}else{
+ 				outputStringHukmLine = `${outputStringHukmLine}<br>${tab} Aadat is now ${daysHoursMinutes(aadatNifaas)} nifaas, ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(aadatHaiz)} haiz.<br>`;
+	 		}
+ 			return(outputStringHukmLine);
+ 		}
+
+
+ 		function dealWithBiggerThanFortyNifas(fixedPeriods){
+ 			//This is supposed to do 2 things - return haztuhr array, and put solution text in fixed periods
+ 			var hazTuhrArray = copy(fixedPeriods);
+ 			var aadatNifaas = -1;
+ 			if(givenAadatOfNifaas>-1){
+ 				aadatNifaas = Number(givenAadatOfNifaas);
+ 			}
+			var aadatHaiz = -1;
+			var aadatTuhr = -1;
+
+			if(givenAadatOfTuhr > -1){
+				aadatTuhr = Number(givenAadatOfTuhr);
+			}
+			if(givenAadatOfHaiz > -1){
+				aadatHaiz = Number(givenAadatOfHaiz);
+			}
+
+ 			//we don't have to go to the trouble of finding the nifaas period. it is the first one.
+ 			var nifaasPeriod = hazTuhrArray[0];
+ 			var damInMuddateNifaas = nifaasPeriod[0];
+
+ 			//first change the length of nifaas period to aadat. mark extra after as istihazaAfter
+ 			var istihazaAfter = nifaasPeriod[0]-aadatNifaas;
+ 			nifaasPeriod[0] = aadatNifaas;
+
+ 			var dividend = -1;
+ 			var remainder = -1;
+ 			var newAadatHaiz = -1;
+ 			var newIstihazaAfter = -1;
+
+ 			if(istihazaAfter>aadatTuhr+3){//if we have a period that extends to the next aadat
+ 				var output = solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr);
+ 				dividend = output[0];
+ 				remainder = output[1];
+ 				newAadatHaiz = output[2];
+ 				newIstihazaAfter = output[3];
+ 			}
+
+ 			var answerToNifaasBiggerThanForty = printAnswerToNifaasBiggerThanForty(dividend,remainder,newAadatHaiz,newIstihazaAfter,aadatNifaas, aadatHaiz, aadatTuhr, istihazaAfter);
+ 			var currentPeriodOfFP = fixedPeriods[0];
+			currentPeriodOfFP.push(answerToNifaasBiggerThanForty);
+			fixedPeriods[0] = currentPeriodOfFP;
+
+
+
+
+
+ 			var i = 0; //i is the counter for haztuhrArray
+ 			var k = 0; //k is the counter for fixed periods array
+
+ 			//if it's not an extremely long periods here
+ 			if (remainder==-1){
+ 				//add it's amount to tuhur in front of it
+ 				if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
+
+ 					var nextPeriodFP = fixedPeriods[k+1];
+ 			
+ 					var outputString = `${tab}${nextPeriodFP[0]} + ${istihazaAfter} istihaza = ${nextPeriodFP[0]+istihazaAfter} tuhr-e-faasid<br>`;
+ 					nextPeriodFP.push(outputString);
+
+
+ 					fixedPeriods[k+1] = nextPeriodFP;
+
+ 					var nextPeriod=hazTuhrArray[i+1];
+
+ 					nextPeriod[0] = nextPeriod[0] + istihazaAfter; //add istihaza to it
+ 					nextPeriod[1] = 3;//mark it as tuhr faasid
+
+ 					hazTuhrArray[i+1] = nextPeriod;
+
+
+
+ 				}else{//there is no paki in front of it
+ 					//create a new period
+ 					var nextPeriod = [istihazaAfter, 3];
+ 					hazTuhrArray.push(nextPeriod);
+ 					//move hazthurarray one up
+ 					i=i+1;
+ 				}
+ 			}else{//it is an extremely long period
+ 				//add the dividend number of periods of haz and tuhur
+
+ 				//add periods of haz and tuhur for the daur time in haztuhurarray
+ 				for (var j=0; j<dividend; j++){//add the right number of cycles
+ 					var nextTuhrPeriod = [aadatTuhr, 3];
+ 					var nextHaizPeriod = [aadatHaiz, 0];
+ 					hazTuhrArray.splice(i+1,0,nextTuhrPeriod,nextHaizPeriod);
+ 					//move i forward with each
+ 					i = i+2;
+ 				}
+
+ 				//now deal with remainder
+ 				if(remainder>=aadatTuhr+3){//ends in tuhr + haiz
+ 					var nextTuhrPeriod = [aadatTuhr, 3];
+ 					var nextHaizPeriod = [newAadatHaiz, 0];
+ 					hazTuhrArray.splice(i+1,0,nextTuhrPeriod,nextHaizPeriod);
+ 					i = i+2;
+ 					//as aadat of haiz changes, let's do that now
+ 					aadatHaiz = newAadatHaiz;
+
+
+ 				}else{//remainder ends in tuhur
+ 					//add amount of newIstihazafter to the next period mark it as fasid.
+ 					if(newIstihazaAfter>0){
+ 						if (i < hazTuhrArray.length-1){//there is a paki in front of it. 
+
+ 							var nextPeriodFP = fixedPeriods[k+1];
+ 						
+ 							var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${nextPeriodFP[0]+newIstihazaAfter} tuhr-e-faasid<br>`;
+ 							nextPeriodFP.push(outputString);
+
+
+ 							fixedPeriods[k+1] = nextPeriodFP;
+
+ 							var nextPeriod=hazTuhrArray[i+1];
+
+ 							nextPeriod[0] = nextPeriod[0] + newIstihazaAfter; //add istihaza to it
+ 							nextPeriod[1] = 3;//mark it as tuhr faasid
+
+ 							hazTuhrArray[i+1] = nextPeriod;
+
+
+
+ 						}else{//there is no paki in front of it
+ 							//create a new period
+ 							var nextPeriod = [newIstihazaAfter, 3];
+ 							hazTuhrArray.push(nextPeriod);
+ 							//move i one forward
+ 							i=i+1;
+ 						}
+ 					}else{
+ 						//if it is zero, then it ends at the exact moment of aadat, I guess. we do nothing.
+ 					}									
+ 				}
+ 			}
+
+
+
+ 		}
 
  		function dealWithBiggerThanTenDam(fixedPeriods){
  			//This returns the hazTuhurArray. It also pushes solution text into fixedperiods array
@@ -895,11 +1067,10 @@
 
 						if(istihazaAfter>aadatTuhr+3){//if we have a period that extends to the next aadat
 							var output = solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr);
-							var dividend = output[0];
-							var remainder = output[1];
-							var newAadatHaiz = output[2];
-							var newIstihazaAfter = output[3];
-//							var answerToLongIstihaza = printAnswerToLongIstihaza(dividend,remainder,newAadatHaiz,newIstihazaAfter);
+							dividend = output[0];
+							remainder = output[1];
+							newAadatHaiz = output[2];
+							newIstihazaAfter = output[3];
 						}
 
 						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter);
@@ -1102,25 +1273,140 @@
 
 			var damInMuddateNifaas = 0;
 
-			for (var i = 0; i < fixedPeriods.length - 1; i++) {
+			for (var i = 0; i <= fixedPeriods.length - 1; i++) {
 				var currentPeriod = fixedPeriods[i];
-				var nextPeriod = fixedPeriods[(i+1)];
+//				var nextPeriod = fixedPeriods[(i+1)];
 
+//				var previousPeriod = fixedPeriods[i-1];
 
 				if (currentPeriod[0] > -1){//if it is not istimrar, add em all up, dams and tuhurs
+					// if(i==1){
+					// 	damInMuddateNifaas = damInMuddateNifaas + currentPeriod[0] + previousPeriod[0];
+					// }
 					damInMuddateNifaas = damInMuddateNifaas + currentPeriod[0];
 					if (damInMuddateNifaas > 40){
-						if (currentPeriod[1] == 1){//if it ended at a tuhur (which must be greater than 15)
+						if (currentPeriod[1] == 1 && i>=1){//if it ended at a tuhur (which must be tamm, as we've eliminated naqis), and there was a period before this
+							var previousPeriod = fixedPeriods[i-1];
 							damInMuddateNifaas = damInMuddateNifaas - currentPeriod[0];
+
 							//announce a new aadat for nifas
+							givenAadatOfNifaas = damInMuddateNifaas;
+
 							//remove this amount from fixed periods
+							//actually, probably we should leave it in fixed periods, just mark it's type as nifaas.
+
+							//first make it all muttasil.
+
+							previousPeriod[0] = damInMuddateNifaas;//increase length of last period
+							previousPeriod[1] = 4; //type 4 will be nifas
+
+
+							for (var j=0; j<i-1; j++){//delete all previous periods
+								//store position of first period in previous period
+								var firstPeriod = fixedPeriods[0];
+								previousPeriod[2] = previousPeriod[2].concat(firstPeriod[2]);
+								//delete first period
+								fixedPeriods.shift();
+							}
+
 							//run periods on the remaing bit.
+
+							//Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
+							//this should be safe as there shouldn't be any left from nifas
+							fixedPeriods = removeDamLessThanThree(fixedPeriods);
+
+
+							//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
+							// this should also be fine, as it deals with type 0, and nifas is type 4
+							var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
+
+							return(fixedPeriods);
+
 							break;
 						}else{//if it ended at a dam
-							//get aadat of nifaas. subtract it from dam in muddat-e-nifas. make that nifas. announce it.
-							//all the leftover dam, mark it as istihaza. give it the istihaza check (which hasn't been written yet.)
+							//first make it all muttasil.
+
+							currentPeriod[0] = damInMuddateNifaas;//increase length of current period
+							currentPeriod[1] = 4; //type 4 will be nifas
+
+
+							for (var j=0; j<i; j++){//delete all previous periods
+								//store position of first period in current period
+								var firstPeriod = fixedPeriods[0];
+								currentPeriod[2] = currentPeriod[2].concat(firstPeriod[2]);
+								//delete first period
+								fixedPeriods.shift();
+							}
+
+
+
+							//get aadat of nifaas. 
+							if(givenAadatOfNifaas!=-1){//if we have an aadat of nifas
+								var hazTuhrArray = dealWithBiggerThanFortyNifas(fixedPeriods);
+
+								//Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
+								//this should be safe as there shouldn't be any left from nifas
+								fixedPeriods = removeDamLessThanThree(fixedPeriods);
+
+
+								//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
+								// this should also be fine, as it deals with type 0, and nifas is type 4
+								var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
+
+								return(fixedPeriods);
+
+							}else{//if aadat didn;t exist
+								break;
+							}
 
 						}
+
+					}else if(i==fixedPeriods.length){//dam is less than 40, but this is the last period we have
+						if(currentPeriod[1] == 1){//if the last thing was a tuhr
+							//make everything before it nifaas
+							if(i>0){//if there is a previous period
+								var previousPeriod = fixedPeriods[i-1];
+								damInMuddateNifaas = damInMuddateNifaas - currentPeriod[0];
+
+								//announce a new aadat for nifas
+								givenAadatOfNifaas = damInMuddateNifaas;
+
+								//remove this amount from fixed periods
+								//actually, probably we should leave it in fixed periods, just mark it's type as nifaas.
+
+								//first make it all muttasil.
+
+								previousPeriod[0] = damInMuddateNifaas;//increase length of last period
+								previousPeriod[1] = 4; //type 4 will be nifas
+
+
+								for (var j=0; j<i-1; j++){//delete all previous periods
+									//store position of first period in previous period
+									var firstPeriod = fixedPeriods[0];
+									previousPeriod[2] = previousPeriod[2].concat(firstPeriod[2]);
+									//delete first period
+									fixedPeriods.shift();
+								}
+
+							}
+
+						}else{//last thing was dam
+							//first make it all muttasil.
+							currentPeriod[0] = damInMuddateNifaas;//increase length of last period
+							currentPeriod[1] = 4; //type 4 will be nifas
+
+							for (var j=0; j<i; j++){//delete all previous periods
+								//store position of first period in current period
+								var firstPeriod = fixedPeriods[0];
+								currentPeriod[2] = currentPeriod[2].concat(firstPeriod[2]);
+								//delete first period
+								fixedPeriods.shift();
+							}
+
+
+						}
+						return(fixedPeriods);
+
 
 					}
 				}
@@ -1319,6 +1605,7 @@
 				//spot is duration 0, type dam 0
 				//spotting is regular dam 0
 				//period[2] contains positions info which helps generate the string of sums
+				//type 4 is nifaas
 				if (period[1]==1){//tuhur
 					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} tuhur</b> <br>`;
 
@@ -1336,7 +1623,11 @@
 
 				}else if(period[1]==3){//tuhure faasid
 					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} tuhur e faasid</b> <br>`;
+				}else if(period[1]==4){//nifaas
+					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} nifaas</b> <br>`;
+
 				}
+
 				var positionsArray = period[2];
 				var stringOfSums = getValuesOfPositions(positionsArray);
 				if (stringOfSums!=""){
@@ -1365,6 +1656,10 @@
 					if(period.length>3){//if there is a solution (if no adat, there wouldn't be)
 						periodsoutput = `${periodsoutput}${period[3]}`;
 					}
+				}
+				if(period[1]==4 && period.length>3){//for nifas
+					periodsoutput = `${periodsoutput}${period[3]}`;
+					checkNextTuhur = 1;
 				}
 				if(i == fixedPeriods.length-1 && period.length>=5){//if this is the last period and there is an askagainLine(period[4])
 					periodsoutput = `${periodsoutput}<br>&nbsp;<br>${period[4]}`;
@@ -1413,7 +1708,7 @@
 
 			var combinedArray = [];
 	
-			for(var i=0, i<haztuhur1.length, i++){
+			for(var i=0; i<haztuhur1.length; i++){
 				var date = haztuhur1[i];
 				var evenOdd = i % 2; //if even is 0, it's even, 1, it's odd
 				var array = [];
@@ -1424,7 +1719,7 @@
 				}
 				combinedArray.push(array);
 			}
-			for(var i=0, i<haztuhur2.length, i++){
+			for(var i=0; i<haztuhur2.length; i++){
 				var date = haztuhur2[i];
 				var evenOdd = i % 2; //if even is 0, it's even, 1, it's odd
 				var array = [];
@@ -1441,7 +1736,7 @@
 
 			var outputString = ``;
 			//this loop ought to step through all the values, adding and subtracting counter as it goes.
-			for (var i=0, i<combinedArray.length, i++){
+			for (var i=0; i<combinedArray.length; i++){
 				var currentArray = combinedArray[i];
 				var counter = 0;
 				if (currentArray[1] == "S1" || currentArray[1] == "S2"){
@@ -1614,6 +1909,54 @@
 
 		var givenAadatOfHaiz=-1;
 		var givenAadatOfTuhr=-1;
+		var givenAadatOfNifaas=-1;
+
+		function onChangeAadatN(){
+			var aadatNifaas = gid("aadatNifaasN").value;
+			var aadatHaiz = gid("aadatHaizN").value;
+			var aadatTuhur = gid("aadatTuhrN").value;
+
+			if(aadatNifaas>40){
+				aadatNifaas = -1;
+			}
+			if(aadatHaiz<3 || aadatHaiz >10){
+				aadatHaiz = -1;
+			}
+			if (aadatTuhur<15){
+				aadatTuhur = -1;
+			}
+
+			var aadatTextN = `Aadat is `;
+			if (aadatHaiz!=-1){
+				aadatTextN = `${aadatTextN}${aadatHaiz} days haiz, `;
+				givenAadatOfHaiz = aadatHaiz;
+
+			}			
+			if (aadatTuhur!=-1){
+				aadatTextN = `${aadatTextN}${aadatTuhur} days tuhur, `;
+				givenAadatOfTuhr = aadatTuhur;
+
+			}
+
+			if (aadatNifaas!=-1){
+				aadatTextN = `${aadatTextN}${aadatNifaas} days nifaas, `;
+				givenAadatOfNifaas = aadatNifaas;
+
+			}
+			if(aadatTextN.endsWith(", ")){
+				aadatTextN.slice(0, aadatTextN.length-3);
+			}
+
+			gid("aadatTextN").innerHTML = aadatTextN;
+
+			//trigger calculate
+			// var fixedPeriods = fixPeriodsArray();
+			// var periodsoutput = printPeriodsArray(fixedPeriods);
+			// gid("hallMS").innerHTML = `${periodsoutput}`;
+
+		}
+
+
 
 		function onChangeAadat(){
 			var aadatText = gid("aadatMS").value;
@@ -1793,9 +2136,9 @@
   	<p>!!!!Under Construction!!!!Nifaas ka Sawaal !!!Is Not Done Yet!!!!</p>
 	<table>
 		<tr><td>Adat:</td></tr>
-		<tr><td>Haiz</td><td><input type="text" id="aadatN" onchange="onChangeAadatN()" value=""></td></tr>
-		<tr><td>Tuhr</td><td><input type="text" id="aadatN" onchange="onChangeAadatN()" value=""></td></tr>
-		<tr><td>Nifaas</td><td><input type="text" id="aadatN" onchange="onChangeAadatN()" value=""></td></tr>
+		<tr><td>Haiz</td><td><input type="text" id="aadatHaizN" onchange="onChangeAadatN()" value=""></td></tr>
+		<tr><td>Tuhr</td><td><input type="text" id="aadatTuhrN" onchange="onChangeAadatN()" value=""></td></tr>
+		<tr><td>Nifaas</td><td><input type="text" id="aadatNifaasN" onchange="onChangeAadatN()" value=""></td></tr>
 	</table>
 	<p>&nbsp;</p>
   	<p>Wiladat kay baad khoon ki tarteeb</p>
@@ -1810,6 +2153,7 @@
 	<input type="button" value="Submit" id="submitButtonN" onclick="submitDimaAthaarN()">
 	<input type="button" value="Reset" onclick="resetDimaAthaarN()"><br>
 
+	<p><span id="aadatTextN"></span></p>
 
 	<p><span id="solutionN"></span></p>
 
