@@ -799,7 +799,7 @@
  			return(output);
  		}
 
- 		function printAnswerToNifaasBiggerThanForty(dividend,remainder,newAadatHaiz,newIstihazaAfter,aadatNifaas, aadatHaiz, aadatTuhr){
+ 		function printAnswerToNifaasBiggerThanForty(dividend,remainder,newAadatHaiz,newIstihazaAfter,aadatNifaas, aadatHaiz, aadatTuhr, istihazaAfter){
  			var outputStringHukmLine = `${tab}Starting from birth, the first ${daysHoursMinutes(aadatNifaas)} are nifaas, `;
 
  			if(newIstihazaAfter!=-1){//this is if it's a long istihaza. it'll either be 0, or another value.
@@ -817,7 +817,7 @@
 	 			}
 	 			outputStringHukmLine = `${outputStringHukmLine}${line2}${line3}<br>`;
 			}else{//it isn't a long istihaza
-	 			outputStringHukmLine = `${outputStringHukmLine}then the remaining ${daysHoursMinutes(remainder)} are istihaza.`;
+	 			outputStringHukmLine = `${outputStringHukmLine}then the remaining ${daysHoursMinutes(istihazaAfter)} are istihaza.`;
 
 	 		}
 	 		//aadat line
@@ -836,6 +836,9 @@
  			var aadatNifaas = -1;
  			if(givenAadatOfNifaas>-1){
  				aadatNifaas = Number(givenAadatOfNifaas);
+ 			}else{
+ 				aadatNifaas = -1;
+ 				return;//can't do anything here without aadat.
  			}
 			var aadatHaiz = -1;
 			var aadatTuhr = -1;
@@ -843,8 +846,13 @@
 			if(givenAadatOfTuhr > -1){
 				aadatTuhr = Number(givenAadatOfTuhr);
 			}
+			else{
+				return;
+			}
 			if(givenAadatOfHaiz > -1){
 				aadatHaiz = Number(givenAadatOfHaiz);
+			}else{
+				return;
 			}
 
  			//we don't have to go to the trouble of finding the nifaas period. it is the first one.
@@ -1273,7 +1281,7 @@
 
 			var damInMuddateNifaas = 0;
 
-			for (var i = 0; i <= fixedPeriods.length - 1; i++) {
+			for (var i = 0; i < fixedPeriods.length; i++) {
 				var currentPeriod = fixedPeriods[i];
 //				var nextPeriod = fixedPeriods[(i+1)];
 
@@ -1309,20 +1317,6 @@
 								fixedPeriods.shift();
 							}
 
-							//run periods on the remaing bit.
-
-							//Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
-							//this should be safe as there shouldn't be any left from nifas
-							fixedPeriods = removeDamLessThanThree(fixedPeriods);
-
-
-							//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
-							// this should also be fine, as it deals with type 0, and nifas is type 4
-							var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
-
-							return(fixedPeriods);
-
-							break;
 						}else{//if it ended at a dam
 							//first make it all muttasil.
 
@@ -1337,31 +1331,28 @@
 								//delete first period
 								fixedPeriods.shift();
 							}
-
-
-
 							//get aadat of nifaas. 
 							if(givenAadatOfNifaas!=-1){//if we have an aadat of nifas
 								var hazTuhrArray = dealWithBiggerThanFortyNifas(fixedPeriods);
 
-								//Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
-								//this should be safe as there shouldn't be any left from nifas
-								fixedPeriods = removeDamLessThanThree(fixedPeriods);
-
-
-								//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
-								// this should also be fine, as it deals with type 0, and nifas is type 4
-								var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
-
-								return(fixedPeriods);
-
 							}else{//if aadat didn;t exist
-								break;
+								currentPeriod.push("Aadat is needed");
+								fixedPeriods[0] = currentPeriod;
+								return(fixedPeriods);//this is equivalent to break
 							}
-
 						}
+						//run periods on the remaing bit.
 
-					}else if(i==fixedPeriods.length){//dam is less than 40, but this is the last period we have
+						//Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
+						//this should be safe as there shouldn't be any left from nifas
+						fixedPeriods = removeDamLessThanThree(fixedPeriods);
+
+
+						//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
+						// this should also be fine, as it deals with type 0, and nifas is type 4
+						var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
+
+					}else if(i==fixedPeriods.length-1){//dam is less than 40, but this is the last period we have
 						if(currentPeriod[1] == 1){//if the last thing was a tuhr
 							//make everything before it nifaas
 							if(i>0){//if there is a previous period
@@ -1402,28 +1393,11 @@
 								//delete first period
 								fixedPeriods.shift();
 							}
-
-
 						}
-						return(fixedPeriods);
-
-
 					}
 				}
 			}
-//			return(fixedPeriods);
-
-
-			// //Step 2: Go through all periods. add all dam of less than 3 days, surrounded by tuhur, into tuhurs on either side. mark tuhurs as faasid.
-			// fixedPeriods = removeDamLessThanThree(fixedPeriods);
-
-
-			// //Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
-			// var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
-
 			return(fixedPeriods);
-
-
 		}
 
 
