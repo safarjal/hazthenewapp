@@ -974,7 +974,7 @@
  				}
  			}
 
-
+ 			return(hazTuhrArray);
 
  		}
 
@@ -1351,6 +1351,7 @@
 						//Step 3: Go through them all in order, fixing each period longer than 10, on the way, including istimrar.
 						// this should also be fine, as it deals with type 0, and nifas is type 4
 						var hazTuhrArray = dealWithBiggerThanTenDam(fixedPeriods);
+						break;
 
 					}else if(i==fixedPeriods.length-1){//dam is less than 40, but this is the last period we have
 						if(currentPeriod[1] == 1){//if the last thing was a tuhr
