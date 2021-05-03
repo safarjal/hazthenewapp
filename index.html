@@ -1298,7 +1298,7 @@
 							damInMuddateNifaas = damInMuddateNifaas - currentPeriod[0];
 
 							//announce a new aadat for nifas
-							givenAadatOfNifaas = damInMuddateNifaas;
+							var nifaasAadat = damInMuddateNifaas;
 
 							//remove this amount from fixed periods
 							//actually, probably we should leave it in fixed periods, just mark it's type as nifaas.
@@ -1360,7 +1360,7 @@
 								damInMuddateNifaas = damInMuddateNifaas - currentPeriod[0];
 
 								//announce a new aadat for nifas
-								givenAadatOfNifaas = damInMuddateNifaas;
+								var aadatNifaas = damInMuddateNifaas;
 
 								//remove this amount from fixed periods
 								//actually, probably we should leave it in fixed periods, just mark it's type as nifaas.
@@ -1886,11 +1886,11 @@
 		var givenAadatOfNifaas=-1;
 
 		function onChangeAadatN(){
-			var aadatNifaas = gid("aadatNifaasN").value;
-			var aadatHaiz = gid("aadatHaizN").value;
-			var aadatTuhur = gid("aadatTuhrN").value;
+			var aadatNifaas = Number(gid("aadatNifaasN").value);
+			var aadatHaiz = Number(gid("aadatHaizN").value);
+			var aadatTuhur = Number(gid("aadatTuhrN").value);
 
-			if(aadatNifaas>40){
+			if(aadatNifaas>40||aadatNifaas==0){
 				aadatNifaas = -1;
 			}
 			if(aadatHaiz<3 || aadatHaiz >10){
@@ -1918,15 +1918,18 @@
 
 			}
 			if(aadatTextN.endsWith(", ")){
-				aadatTextN.slice(0, aadatTextN.length-3);
+				aadatTextN= aadatTextN.slice(0, aadatTextN.length-2);
+			}
+			if(aadatNifaas==-1||aadatTuhur==-1||aadatHaiz==-1){
+				aadatTextN = `Aadat is incorrect`;
 			}
 
 			gid("aadatTextN").innerHTML = aadatTextN;
 
 			//trigger calculate
-			// var fixedPeriods = fixPeriodsArray();
-			// var periodsoutput = printPeriodsArray(fixedPeriods);
-			// gid("hallMS").innerHTML = `${periodsoutput}`;
+			 var fixedPeriods = fixPeriodsArrayN();
+			 var periodsoutput = printPeriodsArray(fixedPeriods);
+			 gid("hallMS").innerHTML = `${periodsoutput}`;
 
 		}
 
