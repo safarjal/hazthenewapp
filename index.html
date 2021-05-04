@@ -859,7 +859,7 @@
  				if(aadatHaiz==-1||aadatTuhr==-1){
  					//if either aadat doesn't exist
  					var firstPeriod = fixedPeriods[0];
- 					firstPeriod.push("We need aadat of Haiz and Tuhr to solve this.");
+ 					firstPeriod.push(`${tab}We need aadat of Haiz and Tuhr to solve this.<br>`);
  					fixedPeriods[0] = firstPeriod;
  					return;
  				}else{
@@ -1358,7 +1358,7 @@
 								//??????????
 
 							}else{//if aadat didn;t exist
-								currentPeriod.push("Aadat of nifaas is needed. If it's a first birth, please put 40.<br>");
+								currentPeriod.push(`${tab}Aadat of nifaas is needed. If it's a first birth, please put 40.<br>`);
 								fixedPeriods[0] = currentPeriod;
 								return(fixedPeriods);//this is equivalent to break
 							}
