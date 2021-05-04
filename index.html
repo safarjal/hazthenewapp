@@ -846,18 +846,26 @@
 			if(givenAadatOfTuhr > -1){
 				aadatTuhr = Number(givenAadatOfTuhr);
 			}
-			else{
-				return;
-			}
 			if(givenAadatOfHaiz > -1){
 				aadatHaiz = Number(givenAadatOfHaiz);
-			}else{
-				return;
 			}
 
  			//we don't have to go to the trouble of finding the nifaas period. it is the first one.
  			var nifaasPeriod = hazTuhrArray[0];
  			var damInMuddateNifaas = nifaasPeriod[0];
+
+ 			if(damInMuddateNifaas>aadatNifaas+18){
+ 				//we need aadat of tuhur and haiz, can't solve without it
+ 				if(aadatHaiz==-1||aadatTuhr==-1){
+ 					//if either aadat doesn't exist
+ 					var firstPeriod = fixedPeriods[0];
+ 					firstPeriod.push("We need aadat of Haiz and Tuhr to solve this.");
+ 					fixedPeriods[0] = firstPeriod;
+ 					return;
+ 				}else{
+ 					//we got both aadat, and adat of nifaas, so life is good
+ 				}
+ 			}
 
  			//first change the length of nifaas period to aadat. mark extra after as istihazaAfter
  			var istihazaAfter = nifaasPeriod[0]-aadatNifaas;
@@ -1031,6 +1039,9 @@
 
 				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 10)
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
+						var currentPeriodOfFP = fixedPeriods[k];
+						currentPeriodOfFP.push("We need aadat of Haiz and Tuhr to solve this.");
+						fixedPeriods[k] = currentPeriodOfFP;
 						break;
 					}else{//we have both aadaat
 						var mp = previousPeriod[0];
@@ -1323,7 +1334,7 @@
 								fixedPeriods.shift();
 							}
 
-						}else{//if it ended at a dam
+						}else{//if it ended at a dam (and is greater than 40)
 							//first make it all muttasil.
 
 							currentPeriod[0] = damInMuddateNifaas;//increase length of current period
@@ -1401,6 +1412,8 @@
 								fixedPeriods.shift();
 							}
 						}
+					}else{//dam is less than 40 but this is not the last period
+
 					}
 				}
 			}
@@ -1927,9 +1940,9 @@
 			if(aadatTextN.endsWith(", ")){
 				aadatTextN= aadatTextN.slice(0, aadatTextN.length-2);
 			}
-			if(aadatNifaas==-1||aadatTuhur==-1||aadatHaiz==-1){
-				aadatTextN = `Aadat is incorrect`;
-			}
+			// if(aadatNifaas==-1||aadatTuhur==-1||aadatHaiz==-1){
+			// 	aadatTextN = `Aadat is incorrect`;
+			// }
 
 			gid("aadatTextN").innerHTML = aadatTextN;
 
