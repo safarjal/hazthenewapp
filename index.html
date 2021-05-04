@@ -1442,6 +1442,14 @@
 
 
 					}
+					//remove all previous periods, but keep only their position
+					for (var j=0; j<i; j++){//delete all previous periods
+						//store position of first period in current period
+						var firstPeriod = fixedPeriods[0];
+						currentPeriod[2] = currentPeriod[2].concat(firstPeriod[2]);
+						//delete first period
+						fixedPeriods.shift();
+					}
 
 				}
 			}
