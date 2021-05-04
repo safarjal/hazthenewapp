@@ -1425,6 +1425,24 @@
 					}else{//dam is less than 40 but this is not the last period
 
 					}
+				}else{//it is istimrar
+					//we gotta get all the aadaat
+					var aadatTuhr = Number(givenAadatOfTuhr);
+					var aadatHaiz = Number(givenAadatOfHaiz);
+					var aadatNifaas = Number(givenAadatOfNifaas);
+
+					if(aadatTuhr==-1 || aadatHaiz==-1 || aadatNifaas == -1){
+						//if aadat don't exist
+						currentPeriod.push(`${tab}Aadaat of nifaas, haiz and tuhr are needed. If it's a first birth, please put 40 as aadat of nifaas.<br>`);
+					}else if(aadatTuhr>=15 && aadatHaiz>=3 && aadatHaiz<=10 && aadatNifaas<=40){//we have all aadaat
+						currentPeriod.push(`${tab}Starting from birth, the first ${daysHoursMinutes(aadatNifaas)} are nifaas, then there is a cycle of ${daysHoursMinutes(aadatTuhr)} tuhur, and ${daysHoursMinutes(aadatHaiz)} haiz, until bleeding stops.`);
+
+					}else{//this eventuality shouldn't happen, as there is a check for this earlier
+						currentPeriod.push(`${tab}Aadaat are incorrect.`);
+
+
+					}
+
 				}
 			}
 			return(fixedPeriods);
