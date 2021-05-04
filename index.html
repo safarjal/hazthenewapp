@@ -876,7 +876,7 @@
  			var newAadatHaiz = -1;
  			var newIstihazaAfter = -1;
 
- 			if(istihazaAfter>aadatTuhr+3){//if we have a period that extends to the next aadat
+ 			if(istihazaAfter>aadatTuhr+3 && aadatTuhr>=15){//if we have a period that extends to the next aadat (and the aadat is not -1)
  				var output = solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr);
  				dividend = output[0];
  				remainder = output[1];
@@ -1040,7 +1040,7 @@
 				if (currentPeriod[0]>10 && currentPeriod[1] == 0){ // if we pass by dam bigger than 10)
 					if (aadatTuhr == -1 || aadatHaiz == -1){//if there is no aadat, we can't solve this. need more info
 						var currentPeriodOfFP = fixedPeriods[k];
-						currentPeriodOfFP.push("We need aadat of Haiz and Tuhr to solve this.");
+						currentPeriodOfFP.push("We need aadat of Haiz and Tuhr to solve this.<br>");
 						fixedPeriods[k] = currentPeriodOfFP;
 						break;
 					}else{//we have both aadaat
@@ -1052,7 +1052,8 @@
 						//check previous period to see if it has added istihaza, if it does, use that.
 						//this is an ugly method of doing this, but currently expedient
 						if(previousPeriod.length>3){
-							mp = Number(previousPeriod[3].slice(fixedPeriods[1][3].search("=")+2,previousPeriod[3].length - 18))
+							mp = Number(previousPeriod[3].slice(fixedPeriods[1][3].search("=")+2,previousPeriod[3].length - 18));
+							previousPeriod[1] = 3; //set it's type as tuhr - e - faasid (can't be used as aadat)
 						}
 
 						if (dm==0){//in istimrar, assume that dm is a long one.
@@ -1352,8 +1353,12 @@
 							if(givenAadatOfNifaas!=-1){//if we have an aadat of nifas
 								var hazTuhrArray = dealWithBiggerThanFortyNifas(fixedPeriods);
 
+								//we have a problem here. when we run the next two things, they recreate haztuhurarray by copying fixed periods, but don't use the info from this. this info is lost and we need it.
+								//we need to pass haztuhur array into the next few things.....
+								//??????????
+
 							}else{//if aadat didn;t exist
-								currentPeriod.push("Aadat is needed");
+								currentPeriod.push("Aadat of nifaas is needed. If it's a first birth, please put 40.<br>");
 								fixedPeriods[0] = currentPeriod;
 								return(fixedPeriods);//this is equivalent to break
 							}
@@ -1618,7 +1623,7 @@
 				}else if(period[1]==3){//tuhure faasid
 					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} tuhur e faasid</b> <br>`;
 				}else if(period[1]==4){//nifaas
-					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} nifaas</b> <br>`;
+					periodsoutput = `${periodsoutput} <b>${daysHoursMinutes(period[0])} dam in muddat-e-nifaas</b> <br>`;
 
 				}
 
@@ -1949,7 +1954,7 @@
 			//trigger calculate
 			 var fixedPeriods = fixPeriodsArrayN();
 			 var periodsoutput = printPeriodsArray(fixedPeriods);
-			 gid("hallMS").innerHTML = `${periodsoutput}`;
+			 gid("hallN").innerHTML = `${periodsoutput}`;
 
 		}
 
@@ -1999,7 +2004,7 @@
 				gid("hallMS").innerHTML = `${periodsoutput}`;
 
 			}else{
-				gid("aadatTextMS").innerHTML = `Aadat is incorrect`;
+				gid("aadatTextMS").innerHTML = `Aadat is incorrect<`;
 				givenAadatOfTuhr = -1;
 				givenAadatOfHaiz = -1;
 				//trigger calculate
