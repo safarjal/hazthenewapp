@@ -824,7 +824,12 @@
 	 		if (newAadatHaiz!=-1){
 			 	outputStringHukmLine = `${outputStringHukmLine}<br>${tab} Aadat is now ${daysHoursMinutes(aadatNifaas)} nifaas, ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.<br>`;
  			}else{
- 				outputStringHukmLine = `${outputStringHukmLine}<br>${tab} Aadat is now ${daysHoursMinutes(aadatNifaas)} nifaas, ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(aadatHaiz)} haiz.<br>`;
+ 				if(aadatHaiz==-1 || aadatTuhr == -1){
+ 					outputStringHukmLine = `${outputStringHukmLine}<br>${tab} Aadat is now ${daysHoursMinutes(aadatNifaas)} nifaas.<br>`;
+
+ 				}else{
+ 					outputStringHukmLine = `${outputStringHukmLine}<br>${tab} Aadat is now ${daysHoursMinutes(aadatNifaas)} nifaas, ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(aadatHaiz)} haiz.<br>`;
+ 				}
 	 		}
  			return(outputStringHukmLine);
  		}
