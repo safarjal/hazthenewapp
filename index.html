@@ -1796,6 +1796,18 @@
 			return (outputString);
 		}
 
+		function resetDimaAthaarN(){
+			textToPrint = "";
+			givenAadatOfHaiz = -1;
+			givenAadatOfTuhr = -1;
+			givenAadatOfNifaas = -1;
+			periods.splice(0,periods.length);
+			gid("solutionN").innerHTML = `${textToPrint}`;
+			gid("hallN").innerHTML = ``;
+			gid("numberofdaysN").value=`0`;
+			gid("submitButtonN").disabled=false;
+
+		}
 
 		function resetDimaAthaar(){
 			textToPrint = "";
