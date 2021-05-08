@@ -648,7 +648,7 @@
  		}
 
 
- 		function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter){
+ 		function printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter, lastPeriodEntered){
 
  			var outputString = "";
  			var outputStringTitleLine = `${tab}${daysHoursMinutesDigital(mp)}${tab}${daysHoursMinutesDigital(gp)}${tab}${daysHoursMinutesDigital(dm)}${tab}${daysHoursMinutesDigital(hz)}${tab}${qism}<br>`;
@@ -665,16 +665,38 @@
 	 					for (var i=0; i<dividend; i++){//repeat this line the correct nmber of cycles.
 	 						line2 = `${line2}${repeatingLine}`;
 	 					}
-	 					if(remainder>=aadatTuhr+3){
-		 					 line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz. <br>${tab} Aadat is now ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.`;
-	 					}else{
-	 						line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+	 					if(lastPeriodEntered==1){//if this is the last period
+	 						if(remainder>=aadatTuhr){//we don't look at plus 3
+		 						line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(remainder-aadatTuhr)} are haiz.`;
+		 						if(remainder<aadatTuhr+3){
+		 							line3= `${line3} <br>${tab}(If bleeding stops in less than 3 days, this could become istihaza.)`
+		 						}
+	 						}else{
+	 							line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
 
+	 						}
+
+	 					}else{//if this is not the last Period
+	 						if(remainder>=aadatTuhr+3){
+		 						line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz. <br>${tab} Aadat is now ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.`;
+	 						}else{
+	 							line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+
+	 						}
 	 					}
+
+
+	 					
 	 					outputStringHukmLine = `${outputStringHukmLine}${line2}${line3}<br>`;
 
- 					}else{
-	 					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
+ 					}else{//it's a short istihaza ie, less than aadatTuhr+3
+ 						//if it's the last one, and greater than aadatTuhr (though less than +3)
+ 						if(lastPeriodEntered == 1 && istihazaAfter>aadatTuhr){
+		 					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, and the last ${daysHoursMinutes(istihazaAfter-aadatTuhr)} are haiz.<br>${tab}(If bleeding stops before 3 days, it could become istihaza).`;
+ 						}else{
+		 					outputStringHukmLine = `${outputStringHukmLine}, the next ${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
+
+ 						}
  					}
  				}else{//if there is no istihaza after
  					outputStringHukmLine = `${outputStringHukmLine} and the next ${daysHoursMinutes(haz)} are haiz.<br>`;
@@ -689,18 +711,32 @@
 	 				for (var i=0; i<dividend; i++){//repeat this line the correct nmber of cycles.
 	 					line2 = `${line2}${repeatingLine}`;
 	 				}
-	 				if(remainder>=aadatTuhr+3){
-		 				 line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz. <br>${tab} Aadat is now ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.`;
-	 				}else{
-	 					line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+	 				if(lastPeriodEntered==1){//if this is the last period
+	 					if(remainder>=aadatTuhr){//we don't look at plus 3
+		 					line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(remainder-aadatTuhr)} are haiz.`;
+		 					if(remainder<aadatTuhr+3){
+		 							line3= `${line3} <br>${tab}(If bleeding stops in less than 3 days, this could become istihaza.)`
+		 					}
+	 					}else{
+							line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+	 					}
 
-	 				}
+	 				}else{//if this is not the last Period
+	 					if(remainder>=aadatTuhr+3){
+		 					line3 = `then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, then the next ${daysHoursMinutes(newAadatHaiz)} are haiz. <br>${tab} Aadat is now ${daysHoursMinutes(aadatTuhr)} tuhur, ${daysHoursMinutes(newAadatHaiz)} haiz.`;
+	 					}else{
+	 						line3 = `then the next ${daysHoursMinutes(newIstihazaAfter)} are istihaza.`;
+
+						}	
+ 					}
 	 				outputStringHukmLine = `${outputStringHukmLine}${line2}${line3}<br>`;
+ 				}else{//if istihaza after isn't aadat Tuhr +3
+ 					if(istihazaAfter>aadatTuhr && lastPeriodEntered == 1){
+ 						outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(haz)} are haiz, then the next ${daysHoursMinutes(aadatTuhr)} are istihaza, and the last ${daysHoursMinutes(istihazaAfter-aadatTuhr)} are haiz. (If bleeding stops before 3 days, this will become istihaza).<br>`;
+ 					}else{
+ 						outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`; 						
+ 					}
 
-
-
- 				}else{//if istihaza after isn't long
- 					outputStringHukmLine = `${outputStringHukmLine}${daysHoursMinutes(haz)} are haiz, and the last ${daysHoursMinutes(istihazaAfter)} are istihaza.<br>`;
 
  				}
  			}
@@ -742,22 +778,55 @@
  						sTOfIstihaza = eTOfHaz;
  					}
  					//deal with remainder
- 					if(remainder>=aadatTuhr+3){//ends in haiz
- 						eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
- 						sTOfHaz = eTOfIstihaza;
- 						dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki.<br>
- 							${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(endTimeOfIstihazaAfter)} is haiz.<br> 
- 							${tab}Aadat is now ${daysHoursMinutes(newAadatHaiz)} haiz and ${daysHoursMinutes(aadatTuhr)} tuhur.<br>`;
+ 					if(lastPeriodEntered==1){//if this is the last period
+ 						if(remainder>=aadatTuhr){//ends in haiz
+ 							eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
+ 							sTOfHaz = eTOfIstihaza;
+ 							if(remainder>=aadatTuhr+3){
+ 								dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki.<br>
+ 									${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(endTimeOfIstihazaAfter)} is haiz.<br> 
+ 									${tab}Aadat is now ${daysHoursMinutes(newAadatHaiz)} haiz and ${daysHoursMinutes(aadatTuhr)} tuhur.<br>`;
+ 							}else{//last haiz is less than 3
+ 								dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki.<br>
+ 									${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(endTimeOfIstihazaAfter)} is haiz.<br> 
+ 									${tab}(If bleeding stops before ${formatDateTime(addTimeToDate(sTOfHaz,3))} it will become istihaza.)<br>`;
 
- 					}else{//ends in thur
- 						dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki.<br>`;
+ 							}
+
+ 						}else{//ends in thur
+ 							dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki.<br>`;
+ 						}
+
+ 					}else{//this is not the last Period
+ 						if(remainder>=aadatTuhr+3){//ends in haiz
+ 							eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
+ 							sTOfHaz = eTOfIstihaza;
+ 							dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki.<br>
+ 								${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(endTimeOfIstihazaAfter)} is haiz.<br> 
+ 								${tab}Aadat is now ${daysHoursMinutes(newAadatHaiz)} haiz and ${daysHoursMinutes(aadatTuhr)} tuhur.<br>`;
+
+ 						}else{//ends in thur
+ 							dateLine = `${dateLine}${tab}From ${formatDateTime(sTOfIstihaza)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki.<br>`;
+ 						}
+
  					}
  					istihazaAfterLine = dateLine;
 
 
 
- 				}else{//there is no super long period
- 					istihazaAfterLine = `${tab}From ${formatDateTime(startTimeOfIstihazaAfter)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
+ 				}else{//there is no period longer than aadatTuhr+3
+ 					if(lastPeriodEntered==1 && istihazaAfter>aadatTuhr){//if this is the last Period and istihazaAfter enters into Haiz Aaadat, but not 3 days
+ 						sTOfIstihaza = startTimeOfIstihazaAfter;
+ 						eTOfIstihaza = addTimeToDate(sTOfIstihaza, aadatTuhr);
+ 						sTOfHaz = eTOfIstihaza;
+ 						
+ 						istihazaAfterLine = `${tab}From ${formatDateTime(startTimeOfIstihazaAfter)} to ${formatDateTime(eTOfIstihaza)} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>
+ 							${tab}From ${formatDateTime(sTOfHaz)} to ${formatDateTime(endTimeOfIstihazaAfter)} is haiz.<br> 
+ 							${tab}(If bleeding stops before 3 days (${formatDateTime(addTimeToDate(sTOfHaz,3))}), then this will become istihaza.`;
+
+ 					}else{//this is not the last Period
+ 						istihazaAfterLine = `${tab}From ${formatDateTime(startTimeOfIstihazaAfter)} to ${formatDateTime(endTimeOfIstihazaAfter)} is istihaza, yaqeeni paki. Any namaz or roza kept in this time before ghusul was performed must be repeated. Any namaz or roza missed in this time due to the assumption of haz must be repeated.<br>`;
+ 					}
 
  				}
 
@@ -881,7 +950,7 @@
  			var newAadatHaiz = -1;
  			var newIstihazaAfter = -1;
 
- 			if(istihazaAfter>aadatTuhr+3 && aadatTuhr>=15){//if we have a period that extends to the next aadat (and the aadat is not -1)
+ 			if(istihazaAfter>aadatTuhr+3 && aadatTuhr>=15){//if we have a period that extends 3 days into the next aadat (and the aadat is not -1)
  				var output = solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr);
  				dividend = output[0];
  				remainder = output[1];
@@ -1017,6 +1086,13 @@
 				//i is the count of haztuhurarray
 				//k is the count of fixed periods.
 
+				//this checks if it's the last period entered. 
+				var lastPeriodEntered = 0;
+				if (i==hazTuhrArray.length-1){
+					lastPeriodEntered = 1;
+				}
+
+
 
 				//go through all the periods
 
@@ -1096,6 +1172,7 @@
 						var newAadatHaiz = -1;
 						var newIstihazaAfter = -1;
 
+
 						if(istihazaAfter>aadatTuhr+3){//if we have a period that extends to the next aadat
 							var output = solveLongIstihaza(istihazaAfter, aadatHaiz,aadatTuhr);
 							dividend = output[0];
@@ -1104,7 +1181,7 @@
 							newIstihazaAfter = output[3];
 						}
 
-						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter);
+						var answerToStringBiggerThanTen = printAnswerToDamBiggerThan10(mp,gp,dm,hz,qism, istihazaBefore, haz, istihazaAfter, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod, dividend, remainder, newAadatHaiz, newIstihazaAfter, lastPeriodEntered);
 
 						var hukmString = answerToStringBiggerThanTen[0];
 						var hukmStringInDates = answerToStringBiggerThanTen[1];
@@ -2178,9 +2255,9 @@
 
   	<hr>
 
-  	<p>!!!!Under Construction!!!!Nifaas ka Sawaal !!!Is Not Done Yet!!!!</p>
+  	<p>Nifaas ka Sawaal</p>
 	<table>
-		<tr><td>Adat:</td></tr>
+		<tr><td>Aadaat:</td></tr>
 		<tr><td>Haiz</td><td><input type="text" id="aadatHaizN" onchange="onChangeAadatN()" value=""></td></tr>
 		<tr><td>Tuhr</td><td><input type="text" id="aadatTuhrN" onchange="onChangeAadatN()" value=""></td></tr>
 		<tr><td>Nifaas</td><td><input type="text" id="aadatNifaasN" onchange="onChangeAadatN()" value=""></td></tr>
