@@ -460,17 +460,25 @@
 				var previousPeriod = fixedPeriods[i-1];
 				var currentPeriod = fixedPeriods[i];
 				var nextPeriod = fixedPeriods[(i+1)];
-				if (currentPeriod[0]<3 && currentPeriod[0] >= 0 && currentPeriod[1]==0 ){//if value is less than 3 (but not istimrar) and type is dam
+				//add check for last Period
+				if(i == fixedPeriods.length-1){//if this is the last Period
+					//don't do anything
+					//we could also just set the for loop to stop at length-2...
 
-					previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
+				}else{//this is not the last period
+					if (currentPeriod[0]<3 && currentPeriod[0] >= 0 && currentPeriod[1]==0 ){//if value is less than 3 (but not istimrar) and type is dam
 
-					//store position of current period and next period in previousPeriod
-					previousPeriod[2] = previousPeriod[2].concat(currentPeriod[2],nextPeriod[2]);
+						previousPeriod[0]= previousPeriod[0] + currentPeriod[0] + nextPeriod[0]; //add their values
 
-					previousPeriod[1]= 3; // type 3 is for tuhur e faasid
-					fixedPeriods.splice(i, 2); //remove current period, and next period
-					fixedPeriods[i-1] = previousPeriod; //put changed period in here
-					i=i-1;//move i one back
+						//store position of current period and next period in previousPeriod
+						previousPeriod[2] = previousPeriod[2].concat(currentPeriod[2],nextPeriod[2]);
+
+						previousPeriod[1]= 3; // type 3 is for tuhur e faasid
+						fixedPeriods.splice(i, 2); //remove current period, and next period
+						fixedPeriods[i-1] = previousPeriod; //put changed period in here
+						i=i-1;//move i one back
+					}
+
 				}
 			}
 
