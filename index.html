@@ -1278,7 +1278,7 @@
 
 											var nextPeriodFP = fixedPeriods[k+1];
 										
-											var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${nextPeriodFP[0]+newIstihazaAfter} tuhr-e-faasid<br>`;
+											var outputString = `${tab}${daysHoursMinutes(nextPeriodFP[0])} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${daysHoursMinutes(nextPeriodFP[0]+newIstihazaAfter)} tuhr-e-faasid<br>`;
 											nextPeriodFP.push(outputString);
 
 
@@ -1342,9 +1342,9 @@
 
 						var answerToStringBiggerThanTen = printAnswerToIstimrar(mp,gp,hz,qism, istihazaBefore, haz, aadatTuhr, aadatHaiz, startTimeOfCurrentPeriod);
 
-						var currentPeriodOfFP = fixedPeriods[i];
+						var currentPeriodOfFP = fixedPeriods[k];
 						currentPeriodOfFP.push(answerToStringBiggerThanTen);
-						fixedPeriods[i] = currentPeriodOfFP;
+						fixedPeriods[k] = currentPeriodOfFP;
 					}
 				}
 				//iterate k (count of fixed periods)
