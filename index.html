@@ -101,6 +101,7 @@
 				return(returnStatement);
 		}
 
+
 		function formatDateTime(date){
 			//Sat Feb 13 2021 00:00:00 GMT+0500 (Pakistan Standard Time)
 			date = date.slice(0,24);//all GMT stuff removed
@@ -485,35 +486,6 @@
  			return(fixedPeriods);
  		}
 
- 		function formatDateTime(date){
- 			//Sat Feb 13 2021 00:00:00 GMT+0500 (Pakistan Standard Time)
- 			date = date.slice(0,24);//all GMT stuff removed
- 			var dayOfWeek = date.slice(0,3);
- 			var month = date.slice(4,7);
- 			var day = Number(date.slice(8,10));
- 			var year = date.slice(11,15);
- 			var hours = Number(date.slice(16,18));
- 			var ampm = "am";
- 			var minutes = date.slice(19,21);
- 			var seconds = date.slice(22,24);
- 			if (hours > 12){
- 				hours = hours - 12;
- 				ampm = "pm";
- 			}if (hours == 0){
- 				hours = 12;
- 			}
-
- 			if (hours == 12 && minutes == "00" && ampm == "am"){
- 				date = `${month} ${day}, ${year}`;
-
- 			}else{
- 				date = `${hours}:${minutes} ${ampm} on ${month} ${day}, ${year}`;
- 			}
-
-
- 			return (date);
-
- 		}
 
  		function createAskAgainLineForIstimrar(endTimeOfHaz,aadatTuhr, aadatHaiz){
  			var now = new Date();
