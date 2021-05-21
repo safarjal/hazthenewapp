@@ -112,7 +112,7 @@
 			var ampm = "am";
 			var minutes = date.slice(19,21);
 			var seconds = date.slice(22,24);
-			if (hours > 12){
+			if (hours >= 12){
 				hours = hours - 12;
 				ampm = "pm";
 			}if (hours == 0){
