@@ -958,7 +958,7 @@
 
  					var nextPeriodFP = fixedPeriods[k+1];
  			
- 					var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(istihazaAfter)} istihaza = ${nextPeriodFP[0]+istihazaAfter} tuhr-e-faasid<br>`;
+ 					var outputString = `${tab}${daysHoursMinutes(nextPeriodFP[0])} + ${daysHoursMinutes(istihazaAfter)} istihaza = ${daysHoursMinutes(nextPeriodFP[0]+istihazaAfter)} tuhr-e-faasid<br>`;
  					nextPeriodFP.push(outputString);
 
 
@@ -1009,7 +1009,7 @@
 
  							var nextPeriodFP = fixedPeriods[k+1];
  						
- 							var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${nextPeriodFP[0]+newIstihazaAfter} tuhr-e-faasid<br>`;
+ 							var outputString = `${tab}${daysHoursMinutes(nextPeriodFP[0])} + ${daysHoursMinutes(newIstihazaAfter)} istihaza = ${daysHoursMinutes(nextPeriodFP[0]+newIstihazaAfter)} tuhr-e-faasid<br>`;
  							nextPeriodFP.push(outputString);
 
 
@@ -1200,7 +1200,7 @@
 
 									var nextPeriodFP = fixedPeriods[k+1];
 		
-									var outputString = `${tab}${nextPeriodFP[0]} + ${daysHoursMinutes(istihazaAfter)} istihaza = ${nextPeriodFP[0]+istihazaAfter} tuhr-e-faasid<br>`;
+									var outputString = `${tab}${daysHoursMinutes(nextPeriodFP[0])} + ${daysHoursMinutes(istihazaAfter)} istihaza = ${daysHoursMinutes(nextPeriodFP[0]+istihazaAfter)} tuhr-e-faasid<br>`;
 									nextPeriodFP.push(outputString);
 
 
